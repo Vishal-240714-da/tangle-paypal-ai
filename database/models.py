@@ -5,17 +5,53 @@ from sqlalchemy import (
     Date,
     DateTime,
     Float,
+    ForeignKey,
     Integer,
     String,
     Text,
-    ForeignKey,
 )
-
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
     pass
+
+
+# ============================================================
+# USERS
+# ============================================================
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    name: Mapped[str] = mapped_column(
+        String(150),
+        nullable=False,
+    )
+
+    email: Mapped[str] = mapped_column(
+        String(255),
+        unique=True,
+        nullable=False,
+    )
+
+    role: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default="ANALYST",
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
 
 
 # ============================================================
@@ -30,14 +66,14 @@ class Invoice(Base):
         primary_key=True,
     )
 
-    customer: Mapped[str | None] = mapped_column(
+    customer: Mapped[str] = mapped_column(
         String(255),
-        nullable=True,
+        nullable=False,
     )
 
-    invoice_date: Mapped[date | None] = mapped_column(
+    invoice_date: Mapped[date] = mapped_column(
         Date,
-        nullable=True,
+        nullable=False,
     )
 
     due_date: Mapped[date | None] = mapped_column(
@@ -45,14 +81,20 @@ class Invoice(Base):
         nullable=True,
     )
 
-    amount: Mapped[float | None] = mapped_column(
+    amount: Mapped[float] = mapped_column(
         Float,
-        nullable=True,
+        nullable=False,
     )
 
-    currency: Mapped[str | None] = mapped_column(
+    currency: Mapped[str] = mapped_column(
         String(10),
-        nullable=True,
+        nullable=False,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
     )
 
 
@@ -84,19 +126,19 @@ class Payment(Base):
         nullable=True,
     )
 
-    payment_date: Mapped[date | None] = mapped_column(
+    payment_date: Mapped[date] = mapped_column(
         Date,
-        nullable=True,
+        nullable=False,
     )
 
-    amount: Mapped[float | None] = mapped_column(
+    amount: Mapped[float] = mapped_column(
         Float,
-        nullable=True,
+        nullable=False,
     )
 
-    currency: Mapped[str | None] = mapped_column(
+    currency: Mapped[str] = mapped_column(
         String(10),
-        nullable=True,
+        nullable=False,
     )
 
     gateway_reference: Mapped[str | None] = mapped_column(
@@ -107,6 +149,12 @@ class Payment(Base):
     payment_fee: Mapped[float | None] = mapped_column(
         Float,
         nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
     )
 
 
@@ -122,19 +170,31 @@ class BankTransaction(Base):
         primary_key=True,
     )
 
-    deposit_date: Mapped[date | None] = mapped_column(
+    payment_id: Mapped[str | None] = mapped_column(
+        String(100),
+        ForeignKey("payments.payment_id"),
+        nullable=True,
+    )
+
+    deposit_date: Mapped[date] = mapped_column(
         Date,
-        nullable=True,
+        nullable=False,
     )
 
-    amount: Mapped[float | None] = mapped_column(
+    amount: Mapped[float] = mapped_column(
         Float,
-        nullable=True,
+        nullable=False,
     )
 
-    currency: Mapped[str | None] = mapped_column(
+    currency: Mapped[str] = mapped_column(
         String(10),
-        nullable=True,
+        nullable=False,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
     )
 
 
@@ -149,6 +209,10 @@ class Case(Base):
         String(100),
         primary_key=True,
     )
+
+    # --------------------------------------------------------
+    # Existing TANGLE fields
+    # --------------------------------------------------------
 
     record_type: Mapped[str | None] = mapped_column(
         String(50),
@@ -191,9 +255,9 @@ class Case(Base):
         nullable=True,
     )
 
-    # ----------------------------
+    # --------------------------------------------------------
     # Financial information
-    # ----------------------------
+    # --------------------------------------------------------
 
     payment_amount: Mapped[float | None] = mapped_column(
         Float,
@@ -235,6 +299,8 @@ class Case(Base):
         nullable=True,
     )
 
+    # IMPORTANT:
+    # PostgreSQL currently stores this field as VARCHAR.
     financial_impact: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True,
@@ -245,9 +311,9 @@ class Case(Base):
         nullable=True,
     )
 
-    # ----------------------------
-    # Decision information
-    # ----------------------------
+    # --------------------------------------------------------
+    # Existing decision information
+    # --------------------------------------------------------
 
     decision: Mapped[str | None] = mapped_column(
         String(100),
@@ -259,10 +325,6 @@ class Case(Base):
         nullable=True,
     )
 
-    # ----------------------------
-    # Related invoice information
-    # ----------------------------
-
     related_invoice_count: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
@@ -271,6 +333,45 @@ class Case(Base):
     related_invoice_ids: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
+    )
+
+    # --------------------------------------------------------
+    # Phase 2 - authoritative lifecycle
+    # --------------------------------------------------------
+
+    status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default="OPEN",
+    )
+
+    risk_level: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    priority_score: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
+    human_review_required: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
     )
 
 
@@ -293,6 +394,10 @@ class Investigation(Base):
         nullable=False,
     )
 
+    # --------------------------------------------------------
+    # Existing fields
+    # --------------------------------------------------------
+
     hypothesis: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
@@ -309,7 +414,7 @@ class Investigation(Base):
     )
 
     investigation_action: Mapped[str | None] = mapped_column(
-        Text,
+        String(100),
         nullable=True,
     )
 
@@ -338,6 +443,36 @@ class Investigation(Base):
         nullable=True,
     )
 
+    # --------------------------------------------------------
+    # Phase 2 semantic fields
+    # --------------------------------------------------------
+
+    finding: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    recommendation: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    confidence: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
+    evidence: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
 
 # ============================================================
 # RISK ASSESSMENTS
@@ -363,6 +498,11 @@ class RiskAssessment(Base):
         nullable=True,
     )
 
+    risk_score: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
     priority_score: Mapped[float | None] = mapped_column(
         Float,
         nullable=True,
@@ -378,9 +518,16 @@ class RiskAssessment(Base):
         nullable=True,
     )
 
+    # Existing database column is VARCHAR.
     financial_impact: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
     )
 
 
@@ -403,6 +550,10 @@ class Review(Base):
         nullable=False,
     )
 
+    # --------------------------------------------------------
+    # Existing fields
+    # --------------------------------------------------------
+
     case_status: Mapped[str | None] = mapped_column(
         String(50),
         nullable=True,
@@ -414,7 +565,7 @@ class Review(Base):
     )
 
     reviewer_decision: Mapped[str | None] = mapped_column(
-        String(50),
+        String(100),
         nullable=True,
     )
 
@@ -431,4 +582,75 @@ class Review(Base):
     final_status: Mapped[str | None] = mapped_column(
         String(50),
         nullable=True,
+    )
+
+    # --------------------------------------------------------
+    # Phase 2 semantic fields
+    # --------------------------------------------------------
+
+    reviewer: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    decision: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    comment: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+
+# ============================================================
+# CASE HISTORY / AUDIT TRAIL
+# ============================================================
+
+class CaseHistory(Base):
+    __tablename__ = "case_history"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    case_id: Mapped[str] = mapped_column(
+        String(100),
+        ForeignKey("cases.case_id"),
+        nullable=False,
+    )
+
+    previous_status: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    new_status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+    )
+
+    changed_by: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    reason: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
     )

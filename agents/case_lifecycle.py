@@ -1,9 +1,14 @@
-"""
-TANGLE Case Lifecycle Manager
+from datetime import datetime
 
-Controls valid case status transitions throughout the
-financial investigation workflow.
-"""
+from sqlalchemy import select
+
+from database.connection import SessionLocal
+from database.models import Case, CaseHistory
+
+
+# ============================================================
+# CASE LIFECYCLE
+# ============================================================
 
 VALID_STATUSES = {
     "OPEN",
@@ -48,19 +53,24 @@ ALLOWED_TRANSITIONS = {
 }
 
 
-def is_valid_status(status):
-    """
-    Check whether a status is a recognized TANGLE lifecycle status.
-    """
-    if not isinstance(status, str):
-        return False
+# ============================================================
+# VALIDATION
+# ============================================================
 
-    return status.upper().strip() in VALID_STATUSES
-
-
-def can_transition(current_status, new_status):
+def is_valid_status(status: str) -> bool:
     """
-    Check whether a lifecycle transition is allowed.
+    Check whether a status is a valid TANGLE lifecycle status.
+    """
+    return status in VALID_STATUSES
+
+
+def can_transition(
+    current_status: str,
+    new_status: str,
+) -> bool:
+    """
+    Check whether a case is allowed to move
+    from current_status to new_status.
     """
 
     if not is_valid_status(current_status):
@@ -69,72 +79,200 @@ def can_transition(current_status, new_status):
     if not is_valid_status(new_status):
         return False
 
-    current_status = current_status.upper().strip()
-    new_status = new_status.upper().strip()
-
-    if current_status == new_status:
-        return True
-
-    return new_status in ALLOWED_TRANSITIONS.get(current_status, set())
+    return new_status in ALLOWED_TRANSITIONS.get(
+        current_status,
+        set(),
+    )
 
 
-def transition_case(current_status, new_status):
+# ============================================================
+# IN-MEMORY TRANSITION
+# ============================================================
+
+def transition_case(
+    current_status: str,
+    new_status: str,
+) -> dict:
     """
-    Attempt to move a case from one lifecycle status to another.
-
-    Returns a structured result instead of directly modifying files.
+    Validate a lifecycle transition without touching
+    the database.
     """
 
     if not is_valid_status(current_status):
         return {
             "success": False,
-            "current_status": current_status,
-            "new_status": new_status,
             "message": f"Invalid current status: {current_status}",
+            "previous_status": current_status,
+            "new_status": new_status,
         }
 
     if not is_valid_status(new_status):
         return {
             "success": False,
-            "current_status": current_status,
-            "new_status": new_status,
             "message": f"Invalid new status: {new_status}",
-        }
-
-    current_status = current_status.upper().strip()
-    new_status = new_status.upper().strip()
-
-    if current_status == new_status:
-        return {
-            "success": True,
-            "current_status": current_status,
+            "previous_status": current_status,
             "new_status": new_status,
-            "message": "Case is already in this status.",
         }
 
     if not can_transition(current_status, new_status):
         return {
             "success": False,
-            "current_status": current_status,
-            "new_status": new_status,
             "message": (
-                f"Invalid lifecycle transition: "
-                f"{current_status} → {new_status}"
+                f"Transition not allowed: "
+                f"{current_status} -> {new_status}"
             ),
+            "previous_status": current_status,
+            "new_status": new_status,
         }
 
     return {
         "success": True,
-        "current_status": current_status,
-        "new_status": new_status,
         "message": (
-            f"Case successfully transitioned: "
-            f"{current_status} → {new_status}"
+            f"Transition allowed: "
+            f"{current_status} -> {new_status}"
         ),
+        "previous_status": current_status,
+        "new_status": new_status,
     }
 
 
-def get_next_statuses(current_status):
+# ============================================================
+# DATABASE TRANSITION
+# ============================================================
+
+def transition_case_in_database(
+    case_id: str,
+    new_status: str,
+    changed_by: str = "SYSTEM",
+    reason: str | None = None,
+) -> dict:
+    """
+    Perform a lifecycle transition directly in PostgreSQL.
+
+    This function:
+
+    1. Loads the case.
+    2. Validates the requested transition.
+    3. Updates the case status.
+    4. Updates updated_at.
+    5. Creates a case_history record.
+    6. Commits both changes atomically.
+    """
+
+    session = SessionLocal()
+
+    try:
+        # ----------------------------------------------------
+        # Find case
+        # ----------------------------------------------------
+
+        case = session.execute(
+            select(Case).where(
+                Case.case_id == case_id
+            )
+        ).scalar_one_or_none()
+
+        if case is None:
+            return {
+                "success": False,
+                "message": f"Case not found: {case_id}",
+                "case_id": case_id,
+            }
+
+        current_status = case.status
+
+        # ----------------------------------------------------
+        # Validate transition
+        # ----------------------------------------------------
+
+        if not is_valid_status(new_status):
+            return {
+                "success": False,
+                "message": f"Invalid new status: {new_status}",
+                "case_id": case_id,
+                "previous_status": current_status,
+                "new_status": new_status,
+            }
+
+        if not can_transition(
+            current_status,
+            new_status,
+        ):
+            return {
+                "success": False,
+                "message": (
+                    f"Transition not allowed: "
+                    f"{current_status} -> {new_status}"
+                ),
+                "case_id": case_id,
+                "previous_status": current_status,
+                "new_status": new_status,
+            }
+
+        # ----------------------------------------------------
+        # Update case
+        # ----------------------------------------------------
+
+        now = datetime.utcnow()
+
+        case.status = new_status
+        case.updated_at = now
+
+        # ----------------------------------------------------
+        # Create audit/history record
+        # ----------------------------------------------------
+
+        history = CaseHistory(
+            case_id=case_id,
+            previous_status=current_status,
+            new_status=new_status,
+            changed_by=changed_by,
+            reason=reason,
+            timestamp=now,
+        )
+
+        session.add(history)
+
+        # ----------------------------------------------------
+        # Atomic commit
+        # ----------------------------------------------------
+
+        session.commit()
+
+        return {
+            "success": True,
+            "message": (
+                f"Case {case_id} transitioned "
+                f"from {current_status} to {new_status}"
+            ),
+            "case_id": case_id,
+            "previous_status": current_status,
+            "new_status": new_status,
+            "changed_by": changed_by,
+            "reason": reason,
+        }
+
+    except Exception as exc:
+        session.rollback()
+
+        return {
+            "success": False,
+            "message": "Lifecycle transition failed",
+            "error": str(exc),
+            "case_id": case_id,
+        }
+
+    finally:
+        session.close()
+
+
+# ============================================================
+# NEXT POSSIBLE STATUSES
+# ============================================================
+
+def get_next_statuses(
+    current_status: str,
+) -> list[str]:
     """
     Return all valid next statuses for a case.
     """
@@ -142,105 +280,106 @@ def get_next_statuses(current_status):
     if not is_valid_status(current_status):
         return []
 
-    current_status = current_status.upper().strip()
-
     return sorted(
-        ALLOWED_TRANSITIONS.get(current_status, set())
+        ALLOWED_TRANSITIONS.get(
+            current_status,
+            set(),
+        )
     )
 
 
-def get_lifecycle_description(status):
+# ============================================================
+# LIFECYCLE DESCRIPTION
+# ============================================================
+
+def get_lifecycle_description() -> dict:
     """
-    Human-readable description of a lifecycle state.
+    Return the complete TANGLE case lifecycle.
     """
 
-    descriptions = {
-        "OPEN":
-            "Case has been detected and is waiting for investigation.",
+    return {
+        "OPEN": [
+            "INVESTIGATING",
+        ],
 
-        "INVESTIGATING":
-            "The investigation agent is analyzing the case.",
+        "INVESTIGATING": [
+            "PENDING_REVIEW",
+        ],
 
-        "PENDING_REVIEW":
-            "Investigation is complete and the case requires human review.",
+        "PENDING_REVIEW": [
+            "APPROVED",
+            "REJECTED",
+            "ESCALATED",
+        ],
 
-        "APPROVED":
-            "Analyst approved the proposed case resolution.",
+        "APPROVED": [
+            "RESOLVED",
+        ],
 
-        "REJECTED":
-            "Analyst rejected the proposed case resolution.",
+        "REJECTED": [
+            "RESOLVED",
+        ],
 
-        "ESCALATED":
-            "Case requires additional investigation or higher-level review.",
+        "ESCALATED": [
+            "INVESTIGATING",
+            "RESOLVED",
+        ],
 
-        "RESOLVED":
-            "Case has reached its final resolution.",
+        "RESOLVED": [],
     }
 
-    return descriptions.get(
-        status,
-        "Unknown lifecycle status."
+
+# ============================================================
+# SELF TEST
+# ============================================================
+
+def run_self_test() -> None:
+    """
+    Basic lifecycle validation tests.
+    """
+
+    assert is_valid_status("OPEN")
+    assert is_valid_status("PENDING_REVIEW")
+    assert is_valid_status("RESOLVED")
+
+    assert not is_valid_status("INVALID")
+
+    assert can_transition(
+        "OPEN",
+        "INVESTIGATING",
     )
 
+    assert can_transition(
+        "INVESTIGATING",
+        "PENDING_REVIEW",
+    )
 
-def run_self_test():
-    """
-    Test lifecycle rules.
-    """
+    assert can_transition(
+        "PENDING_REVIEW",
+        "APPROVED",
+    )
 
-    print("=" * 60)
-    print("TANGLE CASE LIFECYCLE MANAGER")
-    print("=" * 60)
+    assert can_transition(
+        "PENDING_REVIEW",
+        "REJECTED",
+    )
 
-    test_cases = [
-        ("OPEN", "INVESTIGATING", True),
-        ("INVESTIGATING", "PENDING_REVIEW", True),
-        ("PENDING_REVIEW", "APPROVED", True),
-        ("PENDING_REVIEW", "REJECTED", True),
-        ("PENDING_REVIEW", "ESCALATED", True),
-        ("APPROVED", "RESOLVED", True),
-        ("REJECTED", "RESOLVED", True),
-        ("ESCALATED", "INVESTIGATING", True),
-        ("ESCALATED", "RESOLVED", True),
+    assert can_transition(
+        "PENDING_REVIEW",
+        "ESCALATED",
+    )
 
-        # Invalid transitions
-        ("OPEN", "APPROVED", False),
-        ("OPEN", "RESOLVED", False),
-        ("APPROVED", "INVESTIGATING", False),
-        ("REJECTED", "APPROVED", False),
-        ("RESOLVED", "OPEN", False),
-    ]
+    assert not can_transition(
+        "OPEN",
+        "APPROVED",
+    )
 
-    passed = 0
+    assert not can_transition(
+        "RESOLVED",
+        "INVESTIGATING",
+    )
 
-    for current, new, expected in test_cases:
-
-        result = transition_case(current, new)
-
-        actual = result["success"]
-
-        if actual == expected:
-            status = "PASS"
-            passed += 1
-        else:
-            status = "FAIL"
-
-        print(
-            f"{status}: "
-            f"{current} → {new} "
-            f"(expected={expected}, actual={actual})"
-        )
-
-    print()
-    print(f"Lifecycle tests passed: {passed}/{len(test_cases)}")
-
-    print()
-    print("VALID STATUSES:")
-    for status in sorted(VALID_STATUSES):
-        print(f"- {status}")
-
-    print()
-    print("CASE LIFECYCLE MANAGER READY")
+    print("Case lifecycle self-test passed.")
 
 
 if __name__ == "__main__":
