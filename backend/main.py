@@ -11,6 +11,7 @@ from backend.routes import investigation
 from backend.routes import review
 from backend.routes import analytics
 from backend.routes import data_quality
+from backend.routes.reconciliation import router as reconciliation_router
 
 
 # ============================================================
@@ -115,6 +116,9 @@ app.include_router(
     data_quality.router
 )
 
+app.include_router(
+    reconciliation_router
+)
 # ============================================================
 # ROOT ENDPOINT
 # ============================================================

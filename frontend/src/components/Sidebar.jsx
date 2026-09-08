@@ -29,6 +29,8 @@ function Sidebar() {
 
       <nav className="sidebar-nav">
 
+        {/* DASHBOARD */}
+
         <NavLink
           to="/"
           className={({ isActive }) =>
@@ -41,6 +43,8 @@ function Sidebar() {
           Dashboard
         </NavLink>
 
+
+        {/* CASES */}
 
         <NavLink
           to="/cases"
@@ -55,6 +59,8 @@ function Sidebar() {
         </NavLink>
 
 
+        {/* DATA QUALITY */}
+
         <NavLink
           to="/data-quality"
           className={({ isActive }) =>
@@ -68,6 +74,23 @@ function Sidebar() {
         </NavLink>
 
 
+        {/* RECONCILIATION */}
+
+        <NavLink
+          to="/reconciliation"
+          className={({ isActive }) =>
+            isActive
+              ? "nav-item active"
+              : "nav-item"
+          }
+        >
+          <span>⇄</span>
+          Reconciliation
+        </NavLink>
+
+
+        {/* HUMAN REVIEW */}
+
         <NavLink
           to="/review"
           className={({ isActive }) =>
@@ -80,6 +103,8 @@ function Sidebar() {
           Human Review
         </NavLink>
 
+
+        {/* ANALYTICS */}
 
         <NavLink
           to="/analytics"

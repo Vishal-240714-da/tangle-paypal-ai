@@ -11,6 +11,7 @@ import Investigation from "./pages/Investigation";
 import Review from "./pages/Review";
 import Analytics from "./pages/Analytics";
 import DataQuality from "./pages/DataQuality";
+import Reconciliation from "./pages/Reconciliation";
 
 import Layout from "./components/Layout";
 
@@ -19,9 +20,7 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
-
       <Layout>
-
         <Routes>
 
           {/* ==================================================
@@ -33,7 +32,6 @@ function App() {
             element={<Dashboard />}
           />
 
-
           {/* ==================================================
               CASES
               ================================================== */}
@@ -42,7 +40,6 @@ function App() {
             path="/cases"
             element={<Cases />}
           />
-
 
           {/* ==================================================
               DATA QUALITY
@@ -53,6 +50,14 @@ function App() {
             element={<DataQuality />}
           />
 
+          {/* ==================================================
+              RECONCILIATION
+              ================================================== */}
+
+          <Route
+            path="/reconciliation"
+            element={<Reconciliation />}
+          />
 
           {/* ==================================================
               INVESTIGATION
@@ -63,7 +68,6 @@ function App() {
             element={<Investigation />}
           />
 
-
           {/* ==================================================
               HUMAN REVIEW
               ================================================== */}
@@ -72,7 +76,6 @@ function App() {
             path="/review"
             element={<Review />}
           />
-
 
           {/* ==================================================
               ANALYTICS
@@ -83,7 +86,6 @@ function App() {
             element={<Analytics />}
           />
 
-
           {/* ==================================================
               UNKNOWN ROUTE
               ================================================== */}
@@ -92,9 +94,7 @@ function App() {
             path="*"
             element={
               <div className="page">
-
                 <div className="page-header">
-
                   <h1>
                     Page Not Found
                   </h1>
@@ -102,17 +102,13 @@ function App() {
                   <p>
                     The requested TANGLE page does not exist.
                   </p>
-
                 </div>
-
               </div>
             }
           />
 
         </Routes>
-
       </Layout>
-
     </BrowserRouter>
   );
 }
