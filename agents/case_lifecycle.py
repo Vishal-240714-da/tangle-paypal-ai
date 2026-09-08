@@ -1,6 +1,8 @@
+
 from datetime import datetime
 
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from database.connection import SessionLocal
 from database.models import Case, CaseHistory
@@ -114,7 +116,10 @@ def transition_case(
             "new_status": new_status,
         }
 
-    if not can_transition(current_status, new_status):
+    if not can_transition(
+        current_status,
+        new_status,
+    ):
         return {
             "success": False,
             "message": (
@@ -137,6 +142,126 @@ def transition_case(
 
 
 # ============================================================
+# DATABASE TRANSITION USING EXISTING SESSION
+# ============================================================
+
+def transition_case_with_session(
+    session: Session,
+    case_id: str,
+    new_status: str,
+    changed_by: str = "SYSTEM",
+    reason: str | None = None,
+) -> dict:
+    """
+    Perform a lifecycle transition using an existing
+    SQLAlchemy session.
+
+    This function does NOT commit or close the session.
+
+    The caller controls the final transaction.
+
+    This allows multiple TANGLE operations, such as:
+
+        Case update
+        + CaseHistory
+        + Review update
+
+    to be committed atomically.
+    """
+
+    case = session.execute(
+        select(Case).where(
+            Case.case_id == case_id
+        )
+    ).scalar_one_or_none()
+
+    if case is None:
+        return {
+            "success": False,
+            "message": f"Case not found: {case_id}",
+            "case_id": case_id,
+        }
+
+    current_status = case.status
+
+    # --------------------------------------------------------
+    # Validate new status
+    # --------------------------------------------------------
+
+    if not is_valid_status(new_status):
+        return {
+            "success": False,
+            "message": f"Invalid new status: {new_status}",
+            "case_id": case_id,
+            "previous_status": current_status,
+            "new_status": new_status,
+        }
+
+    # --------------------------------------------------------
+    # Validate transition
+    # --------------------------------------------------------
+
+    if not can_transition(
+        current_status,
+        new_status,
+    ):
+        return {
+            "success": False,
+            "message": (
+                f"Transition not allowed: "
+                f"{current_status} -> {new_status}"
+            ),
+            "case_id": case_id,
+            "previous_status": current_status,
+            "new_status": new_status,
+        }
+
+    # --------------------------------------------------------
+    # Update case
+    # --------------------------------------------------------
+
+    now = datetime.utcnow()
+
+    case.status = new_status
+    case.updated_at = now
+
+    # --------------------------------------------------------
+    # Create audit/history record
+    # --------------------------------------------------------
+
+    history = CaseHistory(
+        case_id=case_id,
+        previous_status=current_status,
+        new_status=new_status,
+        changed_by=changed_by,
+        reason=reason,
+        timestamp=now,
+    )
+
+    session.add(history)
+
+    # --------------------------------------------------------
+    # IMPORTANT:
+    # Do NOT commit here.
+    #
+    # The caller owns the transaction.
+    # --------------------------------------------------------
+
+    return {
+        "success": True,
+        "message": (
+            f"Case {case_id} transitioned "
+            f"from {current_status} to {new_status}"
+        ),
+        "case_id": case_id,
+        "previous_status": current_status,
+        "new_status": new_status,
+        "changed_by": changed_by,
+        "reason": reason,
+    }
+
+
+# ============================================================
 # DATABASE TRANSITION
 # ============================================================
 
@@ -149,108 +274,28 @@ def transition_case_in_database(
     """
     Perform a lifecycle transition directly in PostgreSQL.
 
-    This function:
+    This is the standalone convenience version.
 
-    1. Loads the case.
-    2. Validates the requested transition.
-    3. Updates the case status.
-    4. Updates updated_at.
-    5. Creates a case_history record.
-    6. Commits both changes atomically.
+    It creates its own session and commits the transition.
     """
 
     session = SessionLocal()
 
     try:
-        # ----------------------------------------------------
-        # Find case
-        # ----------------------------------------------------
-
-        case = session.execute(
-            select(Case).where(
-                Case.case_id == case_id
-            )
-        ).scalar_one_or_none()
-
-        if case is None:
-            return {
-                "success": False,
-                "message": f"Case not found: {case_id}",
-                "case_id": case_id,
-            }
-
-        current_status = case.status
-
-        # ----------------------------------------------------
-        # Validate transition
-        # ----------------------------------------------------
-
-        if not is_valid_status(new_status):
-            return {
-                "success": False,
-                "message": f"Invalid new status: {new_status}",
-                "case_id": case_id,
-                "previous_status": current_status,
-                "new_status": new_status,
-            }
-
-        if not can_transition(
-            current_status,
-            new_status,
-        ):
-            return {
-                "success": False,
-                "message": (
-                    f"Transition not allowed: "
-                    f"{current_status} -> {new_status}"
-                ),
-                "case_id": case_id,
-                "previous_status": current_status,
-                "new_status": new_status,
-            }
-
-        # ----------------------------------------------------
-        # Update case
-        # ----------------------------------------------------
-
-        now = datetime.utcnow()
-
-        case.status = new_status
-        case.updated_at = now
-
-        # ----------------------------------------------------
-        # Create audit/history record
-        # ----------------------------------------------------
-
-        history = CaseHistory(
+        result = transition_case_with_session(
+            session=session,
             case_id=case_id,
-            previous_status=current_status,
             new_status=new_status,
             changed_by=changed_by,
             reason=reason,
-            timestamp=now,
         )
 
-        session.add(history)
-
-        # ----------------------------------------------------
-        # Atomic commit
-        # ----------------------------------------------------
+        if not result["success"]:
+            return result
 
         session.commit()
 
-        return {
-            "success": True,
-            "message": (
-                f"Case {case_id} transitioned "
-                f"from {current_status} to {new_status}"
-            ),
-            "case_id": case_id,
-            "previous_status": current_status,
-            "new_status": new_status,
-            "changed_by": changed_by,
-            "reason": reason,
-        }
+        return result
 
     except Exception as exc:
         session.rollback()

@@ -1,11 +1,43 @@
+import logging
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 
 from backend.routes import dashboard
 from backend.routes import cases
 from backend.routes import investigation
 from backend.routes import review
 from backend.routes import analytics
+
+
+# ============================================================
+# ENVIRONMENT
+# ============================================================
+
+load_dotenv()
+
+
+# ============================================================
+# LOGGING
+# ============================================================
+
+logging.basicConfig(
+    level=os.getenv(
+        "LOG_LEVEL",
+        "INFO",
+    ).upper(),
+    format=(
+        "%(asctime)s | "
+        "%(levelname)s | "
+        "%(name)s | "
+        "%(message)s"
+    ),
+)
+
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================
@@ -25,16 +57,30 @@ app = FastAPI(
 # ============================================================
 # CORS CONFIGURATION
 # ============================================================
-# Allows the React frontend running on localhost:5173
-# to communicate with the FastAPI backend.
+
+# Read allowed frontend origins from the environment.
 #
-# Using "*" is suitable for local development.
-# We can restrict this before deployment.
-# ============================================================
+# Example:
+#
+# TANGLE_CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+#
+# Multiple origins are separated by commas.
+
+cors_origins_raw = os.getenv(
+    "TANGLE_CORS_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173",
+)
+
+cors_origins = [
+    origin.strip()
+    for origin in cors_origins_raw.split(",")
+    if origin.strip()
+]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,31 +91,22 @@ app.add_middleware(
 # API ROUTES
 # ============================================================
 
-# Dashboard routes
 app.include_router(
     dashboard.router
 )
 
-
-# Cases routes
 app.include_router(
     cases.router
 )
 
-
-# Investigation routes
 app.include_router(
     investigation.router
 )
 
-
-# Human Review routes
 app.include_router(
     review.router
 )
 
-
-# Analytics routes
 app.include_router(
     analytics.router
 )
@@ -79,7 +116,10 @@ app.include_router(
 # ROOT ENDPOINT
 # ============================================================
 
-@app.get("/")
+@app.get(
+    "/",
+    summary="TANGLE API root",
+)
 def root():
     return {
         "application": "TANGLE",
@@ -96,8 +136,11 @@ def root():
 # HEALTH CHECK
 # ============================================================
 
-@app.get("/health")
+@app.get(
+    "/health",
+    summary="Health check",
+)
 def health_check():
     return {
-        "status": "healthy"
+        "status": "healthy",
     }
