@@ -3,53 +3,38 @@ import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 
-
 function Review() {
-
   const navigate = useNavigate();
 
   const [reviews, setReviews] = useState([]);
-
   const [summary, setSummary] = useState(null);
-
   const [selectedCase, setSelectedCase] = useState(null);
 
   const [decision, setDecision] = useState("");
-
   const [comment, setComment] = useState("");
 
   const [loading, setLoading] = useState(true);
-
   const [submitting, setSubmitting] = useState(false);
 
   const [error, setError] = useState("");
-
   const [success, setSuccess] = useState("");
-
 
   // ============================================================
   // LOAD REVIEW DATA
   // ============================================================
 
   const loadReviewData = async () => {
-
     try {
-
       setLoading(true);
-
       setError("");
 
       const [
         pendingResponse,
         summaryResponse,
       ] = await Promise.all([
-
-        api.get("/api/review/pending"),
-
-        api.get("/api/review/summary"),
-
+        api.get("/api/reviews/pending"),
+        api.get("/api/reviews/summary"),
       ]);
-
 
       setReviews(
         Array.isArray(pendingResponse.data)
@@ -57,13 +42,9 @@ function Review() {
           : []
       );
 
-
-      setSummary(
-        summaryResponse.data
-      );
+      setSummary(summaryResponse.data);
 
     } catch (error) {
-
       console.error(
         "Failed to load review data:",
         error
@@ -72,343 +53,209 @@ function Review() {
       setError(
         "Unable to load human review data. Please make sure the FastAPI backend is running."
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
-
 
   // ============================================================
   // INITIAL LOAD
   // ============================================================
 
   useEffect(() => {
-
     loadReviewData();
-
   }, []);
-
 
   // ============================================================
   // SELECT CASE
   // ============================================================
 
   const handleSelectCase = (review) => {
-
     setSelectedCase(review);
-
     setDecision("");
-
     setComment("");
-
     setError("");
-
     setSuccess("");
-
   };
-
 
   // ============================================================
   // SUBMIT REVIEW
   // ============================================================
 
   const handleSubmitReview = async () => {
-
     if (!selectedCase) {
-
       return;
-
     }
 
-
     if (!decision) {
-
       setError(
         "Please select APPROVE, REJECT, or ESCALATE."
       );
-
       return;
-
     }
 
-
     setSubmitting(true);
-
     setError("");
-
     setSuccess("");
 
-
     try {
-
       const response = await api.post(
-        `/api/review/${selectedCase.case_id}`,
+        `/api/reviews/${selectedCase.case_id}`,
         {
           reviewer_decision: decision,
           reviewer_comment: comment,
         }
       );
 
-
       setSuccess(
         response.data?.message ||
         `Case ${selectedCase.case_id} successfully reviewed.`
       );
 
-
-      /*
-       * Refresh the queue and summary.
-       */
-
       await loadReviewData();
 
-
-      /*
-       * Clear the selected case after
-       * successful submission.
-       */
-
       setSelectedCase(null);
-
       setDecision("");
-
       setComment("");
 
     } catch (error) {
-
       console.error(
         "Failed to submit review:",
         error
       );
 
-
       const message =
         error.response?.data?.detail ||
         "Unable to submit the review.";
 
-
       setError(message);
 
     } finally {
-
       setSubmitting(false);
-
     }
-
   };
-
 
   // ============================================================
   // LOADING
   // ============================================================
 
   if (loading) {
-
     return (
-
       <div className="page">
-
         <div className="page-header">
-
-          <h1>
-            Human Review
-          </h1>
-
+          <h1>Human Review</h1>
           <p>
             Loading pending review cases...
           </p>
-
         </div>
-
       </div>
-
     );
-
   }
-
 
   // ============================================================
   // MAIN PAGE
   // ============================================================
 
   return (
-
     <div className="page">
 
       <div className="review-page">
 
-
-        {/* ======================================================
-            PAGE HEADER
-        ====================================================== */}
+        {/* PAGE HEADER */}
 
         <div className="page-header">
-
-          <h1>
-            Human Review
-          </h1>
+          <h1>Human Review</h1>
 
           <p>
             Review AI-investigated cases and make
             governed business decisions.
           </p>
-
         </div>
 
-
-        {/* ======================================================
-            SUMMARY CARDS
-        ====================================================== */}
+        {/* SUMMARY */}
 
         {summary && (
-
           <div className="review-summary-grid">
 
-
             <div className="review-summary-card">
-
-              <span>
-                Total Reviews
-              </span>
-
+              <span>Total Reviews</span>
               <strong>
                 {summary.total_reviews ?? 0}
               </strong>
-
             </div>
 
-
             <div className="review-summary-card">
-
-              <span>
-                Pending
-              </span>
-
+              <span>Pending</span>
               <strong>
                 {summary.pending ?? 0}
               </strong>
-
             </div>
 
-
             <div className="review-summary-card">
-
-              <span>
-                Approved
-              </span>
-
+              <span>Approved</span>
               <strong>
                 {summary.approved ?? 0}
               </strong>
-
             </div>
 
-
             <div className="review-summary-card">
-
-              <span>
-                Rejected
-              </span>
-
+              <span>Rejected</span>
               <strong>
                 {summary.rejected ?? 0}
               </strong>
-
             </div>
 
-
             <div className="review-summary-card">
-
-              <span>
-                Escalated
-              </span>
-
+              <span>Escalated</span>
               <strong>
                 {summary.escalated ?? 0}
               </strong>
-
             </div>
 
-
           </div>
-
         )}
 
-
-        {/* ======================================================
-            ERROR
-        ====================================================== */}
+        {/* ERROR */}
 
         {error && (
-
           <div className="review-message review-error">
-
             {error}
-
           </div>
-
         )}
 
-
-        {/* ======================================================
-            SUCCESS
-        ====================================================== */}
+        {/* SUCCESS */}
 
         {success && (
-
           <div className="review-message review-success">
-
             {success}
-
           </div>
-
         )}
 
-
-        {/* ======================================================
-            REVIEW WORKSPACE
-        ====================================================== */}
+        {/* WORKSPACE */}
 
         <div className="review-workspace">
 
-
-          {/* ====================================================
-              LEFT — PENDING QUEUE
-          ==================================================== */}
+          {/* PENDING QUEUE */}
 
           <div className="review-queue">
-
 
             <div className="review-section-header">
 
               <div>
-
-                <h2>
-                  Pending Review
-                </h2>
+                <h2>Pending Review</h2>
 
                 <p>
                   Select a case to review.
                 </p>
-
               </div>
 
-
               <span className="review-count">
-
                 {reviews.length}
-
               </span>
 
             </div>
 
-
             {reviews.length === 0 ? (
-
               <div className="review-empty">
 
                 <strong>
@@ -420,9 +267,7 @@ function Review() {
                 </p>
 
               </div>
-
             ) : (
-
               <div className="review-case-list">
 
                 {reviews.map((item) => (
@@ -441,15 +286,11 @@ function Review() {
                     }
                   >
 
-
-                    {/* CASE ID + RISK */}
-
                     <div className="review-case-top">
 
                       <strong>
                         {item.case_id}
                       </strong>
-
 
                       <span
                         className={
@@ -460,78 +301,54 @@ function Review() {
                           }`
                         }
                       >
-
                         {item.risk_level ||
                           "UNKNOWN"}
-
                       </span>
 
                     </div>
-
-
-                    {/* CATEGORY + PRIORITY */}
 
                     <div className="review-case-middle">
 
                       <span>
-
                         {item.category ||
                           "Transaction Exception"}
-
                       </span>
 
-
                       <span>
-
                         Priority:{" "}
                         {item.priority_score ??
                           "—"}
-
                       </span>
 
                     </div>
-
-
-                    {/* STATUS */}
 
                     <div className="review-case-bottom">
 
                       <span>
-
                         {item.case_status ||
                           "PENDING_REVIEW"}
-
                       </span>
 
-
                       <span>
-
                         {item.human_review_required
                           ? "Review Required"
                           : ""}
-
                       </span>
 
                     </div>
-
 
                   </button>
 
                 ))}
 
               </div>
-
             )}
 
           </div>
 
-
-          {/* ====================================================
-              RIGHT — REVIEW PANEL
-          ==================================================== */}
+          {/* REVIEW PANEL */}
 
           <div className="review-panel">
-
 
             {!selectedCase ? (
 
@@ -541,11 +358,9 @@ function Review() {
                   ✓
                 </div>
 
-
                 <h2>
                   Select a case
                 </h2>
-
 
                 <p>
                   Choose a pending case from the
@@ -558,25 +373,19 @@ function Review() {
 
               <>
 
-
-                {/* ==============================================
-                    CASE HEADER
-                ============================================== */}
+                {/* CASE HEADER */}
 
                 <div className="review-detail-header">
 
                   <div>
 
-                    <span>
-                      CASE
-                    </span>
+                    <span>CASE</span>
 
                     <h2>
                       {selectedCase.case_id}
                     </h2>
 
                   </div>
-
 
                   <button
                     type="button"
@@ -592,141 +401,86 @@ function Review() {
 
                 </div>
 
-
-                {/* ==============================================
-                    CASE INFORMATION
-                ============================================== */}
+                {/* CASE INFORMATION */}
 
                 <div className="review-detail-grid">
 
-
                   <div>
-
-                    <span>
-                      Risk Level
-                    </span>
-
+                    <span>Risk Level</span>
                     <strong>
                       {selectedCase.risk_level ||
                         "—"}
                     </strong>
-
                   </div>
 
-
                   <div>
-
-                    <span>
-                      Priority Score
-                    </span>
-
+                    <span>Priority Score</span>
                     <strong>
                       {selectedCase.priority_score ??
                         "—"}
                     </strong>
-
                   </div>
 
-
                   <div>
-
-                    <span>
-                      Exception
-                    </span>
-
+                    <span>Exception</span>
                     <strong>
                       {selectedCase.category ||
                         "—"}
                     </strong>
-
                   </div>
 
-
                   <div>
-
-                    <span>
-                      AI Decision
-                    </span>
-
+                    <span>AI Decision</span>
                     <strong>
                       {selectedCase.decision ||
                         "INVESTIGATE"}
                     </strong>
-
                   </div>
 
-
                   <div>
-
-                    <span>
-                      Outstanding
-                    </span>
-
+                    <span>Outstanding</span>
                     <strong>
-
                       $
                       {Number(
                         selectedCase.outstanding_amount ||
                         0
                       ).toFixed(2)}
-
                     </strong>
-
                   </div>
 
-
                   <div>
-
-                    <span>
-                      Payment Coverage
-                    </span>
-
+                    <span>Payment Coverage</span>
                     <strong>
-
                       {selectedCase.payment_coverage_percent !=
                       null
                         ? `${Number(
                             selectedCase.payment_coverage_percent
                           ).toFixed(2)}%`
                         : "—"}
-
                     </strong>
-
                   </div>
-
 
                 </div>
 
-
-                {/* ==============================================
-                    AI INVESTIGATION SUMMARY
-                ============================================== */}
+                {/* AI SUMMARY */}
 
                 <div className="review-ai-box">
 
                   <div className="review-ai-title">
-
                     AI Investigation Summary
-
                   </div>
-
 
                   <div className="review-ai-row">
 
-                    <span>
-                      Finding
-                    </span>
+                    <span>Finding</span>
 
                     <p>
-
                       {selectedCase.investigation_finding ||
                         selectedCase.reason ||
                         "Review the complete investigation before making a decision."}
-
                     </p>
 
                   </div>
-
 
                   <div className="review-ai-row">
 
@@ -735,21 +489,16 @@ function Review() {
                     </span>
 
                     <p>
-
                       {selectedCase.recommended_action ||
                         selectedCase.suggested_action ||
                         "See the case investigation for the AI recommendation."}
-
                     </p>
 
                   </div>
 
                 </div>
 
-
-                {/* ==============================================
-                    REVIEWER DECISION
-                ============================================== */}
+                {/* DECISION */}
 
                 <div className="review-decision-section">
 
@@ -757,16 +506,13 @@ function Review() {
                     Reviewer Decision
                   </h3>
 
-
                   <p>
                     The final decision is made by the
                     human reviewer, not automatically
                     by the AI.
                   </p>
 
-
                   <div className="review-decision-buttons">
-
 
                     <button
                       type="button"
@@ -783,7 +529,6 @@ function Review() {
                       APPROVE
                     </button>
 
-
                     <button
                       type="button"
                       className={
@@ -798,7 +543,6 @@ function Review() {
                     >
                       REJECT
                     </button>
-
 
                     <button
                       type="button"
@@ -815,24 +559,17 @@ function Review() {
                       ESCALATE
                     </button>
 
-
                   </div>
 
                 </div>
 
-
-                {/* ==============================================
-                    REVIEW COMMENT
-                ============================================== */}
+                {/* COMMENT */}
 
                 <div className="review-comment-section">
 
                   <label htmlFor="review-comment">
-
                     Reviewer Comment
-
                   </label>
-
 
                   <textarea
                     id="review-comment"
@@ -847,10 +584,7 @@ function Review() {
 
                 </div>
 
-
-                {/* ==============================================
-                    SUBMIT
-                ============================================== */}
+                {/* SUBMIT */}
 
                 <div className="review-submit-area">
 
@@ -863,15 +597,12 @@ function Review() {
                       !decision
                     }
                   >
-
                     {submitting
                       ? "Submitting..."
                       : "Submit Review"}
-
                   </button>
 
                 </div>
-
 
               </>
 
@@ -879,15 +610,12 @@ function Review() {
 
           </div>
 
-
         </div>
 
       </div>
 
     </div>
-
   );
 }
-
 
 export default Review;

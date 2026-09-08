@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 
-
 function Cases() {
   const [cases, setCases] = useState([]);
   const [search, setSearch] = useState("");
@@ -12,7 +11,6 @@ function Cases() {
 
   const navigate = useNavigate();
 
-
   // ============================================================
   // LOAD CASES FROM FASTAPI
   // ============================================================
@@ -20,9 +18,18 @@ function Cases() {
   useEffect(() => {
     const loadCases = async () => {
       try {
+        setLoading(true);
+        setError("");
+
         const response = await api.get("/api/cases");
 
-        setCases(response.data);
+        const data = response.data;
+
+        setCases(
+          Array.isArray(data?.items)
+            ? data.items
+            : []
+        );
       } catch (error) {
         console.error("Failed to load cases:", error);
 
@@ -37,9 +44,8 @@ function Cases() {
     loadCases();
   }, []);
 
-
   // ============================================================
-  // SEARCH / FILTER
+  // SEARCH
   // ============================================================
 
   const filteredCases = cases.filter((item) => {
@@ -60,9 +66,8 @@ function Cases() {
     );
   });
 
-
   // ============================================================
-  // LOADING STATE
+  // LOADING
   // ============================================================
 
   if (loading) {
@@ -76,9 +81,8 @@ function Cases() {
     );
   }
 
-
   // ============================================================
-  // ERROR STATE
+  // ERROR
   // ============================================================
 
   if (error) {
@@ -92,7 +96,6 @@ function Cases() {
     );
   }
 
-
   // ============================================================
   // MAIN PAGE
   // ============================================================
@@ -100,28 +103,18 @@ function Cases() {
   return (
     <div className="page">
 
-      {/* ======================================================
-          PAGE HEADER
-          ====================================================== */}
-
       <div className="page-header">
-
         <h1>Cases</h1>
 
         <p>
           Review and investigate transaction
           anomalies detected by TANGLE.
         </p>
-
       </div>
 
-
-      {/* ======================================================
-          SEARCH
-          ====================================================== */}
+      {/* SEARCH */}
 
       <div className="cases-controls">
-
         <input
           type="text"
           className="search-input"
@@ -131,196 +124,98 @@ function Cases() {
             setSearch(event.target.value);
           }}
         />
-
       </div>
 
-
-      {/* ======================================================
-          CASE COUNT
-          ====================================================== */}
+      {/* COUNT */}
 
       <div className="cases-count">
-
         Showing{" "}
-        <strong>
-          {filteredCases.length}
-        </strong>{" "}
-
+        <strong>{filteredCases.length}</strong>{" "}
         of{" "}
-
-        <strong>
-          {cases.length}
-        </strong>{" "}
-
+        <strong>{cases.length}</strong>{" "}
         cases
-
       </div>
 
-
-      {/* ======================================================
-          CASE TABLE
-          ====================================================== */}
+      {/* TABLE */}
 
       <div className="table-container">
 
         <table className="cases-table">
 
           <thead>
-
             <tr>
-
-              <th>
-                Case ID
-              </th>
-
-              <th>
-                Category
-              </th>
-
-              <th>
-                Type
-              </th>
-
-              <th>
-                Invoice
-              </th>
-
-              <th>
-                Record
-              </th>
-
-              <th>
-                Financial Status
-              </th>
-
-              <th>
-                Outstanding
-              </th>
-
-              <th>
-                Coverage
-              </th>
-
-              <th>
-                Decision
-              </th>
-
-              <th>
-                Action
-              </th>
-
+              <th>Case ID</th>
+              <th>Category</th>
+              <th>Type</th>
+              <th>Invoice</th>
+              <th>Record</th>
+              <th>Financial Status</th>
+              <th>Outstanding</th>
+              <th>Coverage</th>
+              <th>Decision</th>
+              <th>Action</th>
             </tr>
-
           </thead>
-
 
           <tbody>
 
             {filteredCases.map((item) => (
-
               <tr key={item.case_id}>
 
-                {/* CASE ID */}
-
                 <td>
-
                   <strong>
                     {item.case_id}
                   </strong>
-
                 </td>
-
-
-                {/* CATEGORY */}
 
                 <td>
-
                   <span className="category-badge">
-
                     {item.category || "N/A"}
-
                   </span>
-
                 </td>
-
-
-                {/* RECORD TYPE */}
 
                 <td>
                   {item.record_type || "—"}
                 </td>
 
-
-                {/* INVOICE */}
-
                 <td>
                   {item.invoice_id || "—"}
                 </td>
-
-
-                {/* RECORD */}
 
                 <td>
                   {item.record_id || "—"}
                 </td>
 
-
-                {/* FINANCIAL STATUS */}
-
                 <td>
                   {item.financial_status || "—"}
                 </td>
 
-
-                {/* OUTSTANDING */}
-
                 <td>
-
                   $
                   {Number(
                     item.outstanding_amount || 0
-                  ).toLocaleString(
-                    undefined,
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
-
+                  ).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </td>
 
-
-                {/* PAYMENT COVERAGE */}
-
                 <td>
-
                   {item.payment_coverage_percent !== null &&
                   item.payment_coverage_percent !== undefined
                     ? `${Number(
                         item.payment_coverage_percent
                       ).toFixed(2)}%`
                     : "—"}
-
                 </td>
 
-
-                {/* AI DECISION */}
-
                 <td>
-
                   <span className="decision-badge">
-
                     {item.decision || "—"}
-
                   </span>
-
                 </td>
 
-
-                {/* INVESTIGATION BUTTON */}
-
                 <td>
-
                   <button
                     className="view-button"
                     onClick={() => {
@@ -331,30 +226,19 @@ function Cases() {
                   >
                     Investigate
                   </button>
-
                 </td>
 
               </tr>
-
             ))}
 
           </tbody>
 
         </table>
 
-
-        {/* ==================================================
-            NO RESULTS
-            ================================================== */}
-
         {filteredCases.length === 0 && (
-
           <div className="empty-state">
-
             No cases found.
-
           </div>
-
         )}
 
       </div>
@@ -362,6 +246,5 @@ function Cases() {
     </div>
   );
 }
-
 
 export default Cases;
