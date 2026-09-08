@@ -1,29 +1,185 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import api from "../services/api";
 
-function Review() {
+function formatCurrency(value, currency = "INR") {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatPercent(value) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return `${Number(value).toFixed(2)}%`;
+}
+
+function formatScore(value) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return Number(value).toFixed(0);
+}
+
+function formatConfidence(value) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return `${(Number(value) * 100).toFixed(0)}%`;
+}
+
+function parseReasoning(value) {
+  if (!value) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+
+    return [String(parsed)];
+  } catch {
+    return String(value)
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+}
+
+function getRiskClass(riskLevel) {
+  switch (riskLevel) {
+    case "CRITICAL":
+      return "review-risk-critical";
+
+    case "HIGH":
+      return "review-risk-high";
+
+    case "MEDIUM":
+      return "review-risk-medium";
+
+    case "LOW":
+      return "review-risk-low";
+
+    default:
+      return "review-risk-default";
+  }
+}
+
+function getCategoryLabel(category) {
+  if (!category) {
+    return "UNCLASSIFIED";
+  }
+
+  return category
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) =>
+      letter.toUpperCase(),
+    );
+}
+
+function MetricCard({
+  label,
+  value,
+  supporting,
+  emphasis = "",
+}) {
+  return (
+    <div className={`review-metric-card ${emphasis}`}>
+      <span className="review-metric-label">
+        {label}
+      </span>
+
+      <strong className="review-metric-value">
+        {value}
+      </strong>
+
+      {supporting && (
+        <span className="review-metric-supporting">
+          {supporting}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function EvidenceCard({ item }) {
+  return (
+    <div className="review-evidence-card">
+      <div className="review-evidence-top">
+        <span className="review-evidence-label">
+          {item.label}
+        </span>
+
+        {item.source && (
+          <span className="review-evidence-source">
+            {item.source}
+          </span>
+        )}
+      </div>
+
+      <strong className="review-evidence-value">
+        {item.value}
+      </strong>
+    </div>
+  );
+}
+
+export default function Review() {
   const navigate = useNavigate();
 
   const [reviews, setReviews] = useState([]);
   const [summary, setSummary] = useState(null);
-  const [selectedCase, setSelectedCase] = useState(null);
+  const [selectedCaseId, setSelectedCaseId] =
+    useState(null);
 
-  const [decision, setDecision] = useState("");
-  const [comment, setComment] = useState("");
+  const [decision, setDecision] =
+    useState("APPROVE");
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [comment, setComment] =
+    useState("");
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] =
+    useState(true);
 
-  // ============================================================
-  // LOAD REVIEW DATA
-  // ============================================================
+  const [submitting, setSubmitting] =
+    useState(false);
 
-  const loadReviewData = async () => {
+  const [error, setError] =
+    useState("");
+
+  const [success, setSuccess] =
+    useState("");
+
+  const selectedCase = useMemo(
+    () =>
+      reviews.find(
+        (item) =>
+          item.case_id === selectedCaseId,
+      ) || null,
+    [reviews, selectedCaseId],
+  );
+
+  const loadReviewData = async (
+    preserveSelection = true,
+  ) => {
     try {
       setLoading(true);
       setError("");
@@ -36,586 +192,801 @@ function Review() {
         api.get("/api/reviews/summary"),
       ]);
 
-      setReviews(
+      const pending =
         Array.isArray(pendingResponse.data)
           ? pendingResponse.data
-          : []
-      );
+          : [];
 
+      setReviews(pending);
       setSummary(summaryResponse.data);
 
-    } catch (error) {
+      if (pending.length === 0) {
+        setSelectedCaseId(null);
+        return;
+      }
+
+      if (
+        preserveSelection &&
+        selectedCaseId &&
+        pending.some(
+          (item) =>
+            item.case_id === selectedCaseId,
+        )
+      ) {
+        return;
+      }
+
+      setSelectedCaseId(
+        pending[0].case_id,
+      );
+    } catch (requestError) {
       console.error(
         "Failed to load review data:",
-        error
+        requestError,
       );
 
       setError(
-        "Unable to load human review data. Please make sure the FastAPI backend is running."
+        requestError.response?.data?.detail ||
+          "Unable to load human review data.",
       );
     } finally {
       setLoading(false);
     }
   };
 
-  // ============================================================
-  // INITIAL LOAD
-  // ============================================================
-
   useEffect(() => {
-    loadReviewData();
+    loadReviewData(false);
   }, []);
 
-  // ============================================================
-  // SELECT CASE
-  // ============================================================
-
-  const handleSelectCase = (review) => {
-    setSelectedCase(review);
-    setDecision("");
-    setComment("");
-    setError("");
-    setSuccess("");
-  };
-
-  // ============================================================
-  // SUBMIT REVIEW
-  // ============================================================
-
-  const handleSubmitReview = async () => {
+  useEffect(() => {
     if (!selectedCase) {
       return;
     }
 
-    if (!decision) {
-      setError(
-        "Please select APPROVE, REJECT, or ESCALATE."
-      );
+    setDecision(
+      selectedCase.reviewer_decision ||
+        "APPROVE",
+    );
+
+    setComment(
+      selectedCase.reviewer_comment ||
+        "",
+    );
+
+    setSuccess("");
+  }, [selectedCaseId]);
+
+  const handleSubmit = async () => {
+    if (!selectedCase) {
       return;
     }
 
-    setSubmitting(true);
-    setError("");
-    setSuccess("");
-
     try {
+      setSubmitting(true);
+      setError("");
+      setSuccess("");
+
       const response = await api.post(
         `/api/reviews/${selectedCase.case_id}`,
         {
           reviewer_decision: decision,
           reviewer_comment: comment,
-        }
+        },
       );
+
+      const result = response.data;
 
       setSuccess(
-        response.data?.message ||
-        `Case ${selectedCase.case_id} successfully reviewed.`
+        `Decision recorded successfully for ${result.case_id}.`,
       );
 
-      await loadReviewData();
-
-      setSelectedCase(null);
-      setDecision("");
-      setComment("");
-
-    } catch (error) {
+      await loadReviewData(false);
+    } catch (requestError) {
       console.error(
         "Failed to submit review:",
-        error
+        requestError,
       );
 
-      const message =
-        error.response?.data?.detail ||
-        "Unable to submit the review.";
-
-      setError(message);
-
+      setError(
+        requestError.response?.data?.detail ||
+          "Unable to submit the review.",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  // ============================================================
-  // LOADING
-  // ============================================================
-
   if (loading) {
     return (
-      <div className="page">
-        <div className="page-header">
-          <h1>Human Review</h1>
-          <p>
-            Loading pending review cases...
-          </p>
+      <div className="review-page">
+        <div className="review-loading">
+          <div className="review-loading-spinner" />
+          <p>Loading human review workspace...</p>
         </div>
       </div>
     );
   }
 
-  // ============================================================
-  // MAIN PAGE
-  // ============================================================
-
   return (
-    <div className="page">
+    <div className="review-page">
+      {/* ------------------------------------------------ */}
+      {/* HEADER                                           */}
+      {/* ------------------------------------------------ */}
 
-      <div className="review-page">
+      <div className="review-page-header">
+        <div>
+          <div className="review-eyebrow">
+            GOVERNANCE / HUMAN REVIEW
+          </div>
 
-        {/* PAGE HEADER */}
-
-        <div className="page-header">
-          <h1>Human Review</h1>
+          <h1>Human Review Workspace</h1>
 
           <p>
-            Review AI-investigated cases and make
-            governed business decisions.
+            Review AI-detected exceptions, inspect
+            supporting evidence, and record the
+            final human decision.
           </p>
         </div>
 
-        {/* SUMMARY */}
+        <button
+          type="button"
+          className="review-refresh-button"
+          onClick={() =>
+            loadReviewData(false)
+          }
+        >
+          Refresh Queue
+        </button>
+      </div>
 
-        {summary && (
-          <div className="review-summary-grid">
+      {/* ------------------------------------------------ */}
+      {/* SUMMARY                                          */}
+      {/* ------------------------------------------------ */}
 
-            <div className="review-summary-card">
-              <span>Total Reviews</span>
-              <strong>
-                {summary.total_reviews ?? 0}
-              </strong>
-            </div>
+      <div className="review-summary-grid">
+        <MetricCard
+          label="Pending Review"
+          value={summary?.pending ?? 0}
+          supporting="Cases awaiting analyst action"
+          emphasis="review-metric-primary"
+        />
 
-            <div className="review-summary-card">
-              <span>Pending</span>
-              <strong>
-                {summary.pending ?? 0}
-              </strong>
-            </div>
+        <MetricCard
+          label="Completed"
+          value={summary?.completed ?? 0}
+          supporting="Human decisions recorded"
+        />
 
-            <div className="review-summary-card">
-              <span>Approved</span>
-              <strong>
-                {summary.approved ?? 0}
-              </strong>
-            </div>
+        <MetricCard
+          label="Approved"
+          value={summary?.approved ?? 0}
+          supporting="Cases approved by reviewers"
+        />
 
-            <div className="review-summary-card">
-              <span>Rejected</span>
-              <strong>
-                {summary.rejected ?? 0}
-              </strong>
-            </div>
+        <MetricCard
+          label="Escalated"
+          value={summary?.escalated ?? 0}
+          supporting="Cases requiring deeper review"
+        />
+      </div>
 
-            <div className="review-summary-card">
-              <span>Escalated</span>
-              <strong>
-                {summary.escalated ?? 0}
-              </strong>
-            </div>
+      {/* ------------------------------------------------ */}
+      {/* ALERTS                                           */}
+      {/* ------------------------------------------------ */}
 
+      {error && (
+        <div className="review-alert review-alert-error">
+          <strong>Review Error</strong>
+          <span>{error}</span>
+        </div>
+      )}
+
+      {success && (
+        <div className="review-alert review-alert-success">
+          <strong>Decision Recorded</strong>
+          <span>{success}</span>
+        </div>
+      )}
+
+      {/* ------------------------------------------------ */}
+      {/* EMPTY STATE                                      */}
+      {/* ------------------------------------------------ */}
+
+      {reviews.length === 0 ? (
+        <div className="review-empty-state">
+          <div className="review-empty-icon">
+            ✓
           </div>
-        )}
 
-        {/* ERROR */}
+          <h2>Review queue is clear</h2>
 
-        {error && (
-          <div className="review-message review-error">
-            {error}
-          </div>
-        )}
-
-        {/* SUCCESS */}
-
-        {success && (
-          <div className="review-message review-success">
-            {success}
-          </div>
-        )}
-
-        {/* WORKSPACE */}
-
+          <p>
+            There are currently no cases waiting
+            for human review.
+          </p>
+        </div>
+      ) : (
         <div className="review-workspace">
+          {/* -------------------------------------------- */}
+          {/* QUEUE                                        */}
+          {/* -------------------------------------------- */}
 
-          {/* PENDING QUEUE */}
-
-          <div className="review-queue">
-
-            <div className="review-section-header">
-
+          <aside className="review-queue-panel">
+            <div className="review-panel-header">
               <div>
-                <h2>Pending Review</h2>
+                <span className="review-panel-kicker">
+                  PRIORITIZED QUEUE
+                </span>
 
-                <p>
-                  Select a case to review.
-                </p>
+                <h2>Cases</h2>
               </div>
 
-              <span className="review-count">
+              <span className="review-queue-count">
                 {reviews.length}
               </span>
-
             </div>
 
-            {reviews.length === 0 ? (
-              <div className="review-empty">
+            <div className="review-queue-list">
+              {reviews.map((item) => (
+                <button
+                  type="button"
+                  key={item.case_id}
+                  className={`review-queue-item ${
+                    selectedCaseId ===
+                    item.case_id
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedCaseId(
+                      item.case_id,
+                    );
+                    setError("");
+                    setSuccess("");
+                  }}
+                >
+                  <div className="review-queue-item-top">
+                    <strong>
+                      {item.case_id}
+                    </strong>
 
-                <strong>
-                  No pending cases
-                </strong>
+                    <span
+                      className={`review-risk-badge ${getRiskClass(
+                        item.risk_level,
+                      )}`}
+                    >
+                      {item.risk_level ||
+                        "UNKNOWN"}
+                    </span>
+                  </div>
 
-                <p>
-                  All cases have been reviewed.
-                </p>
+                  <div className="review-queue-category">
+                    {getCategoryLabel(
+                      item.category,
+                    )}
+                  </div>
 
-              </div>
-            ) : (
-              <div className="review-case-list">
-
-                {reviews.map((item) => (
-
-                  <button
-                    key={item.case_id}
-                    type="button"
-                    className={
-                      selectedCase?.case_id ===
-                      item.case_id
-                        ? "review-case-item selected"
-                        : "review-case-item"
-                    }
-                    onClick={() =>
-                      handleSelectCase(item)
-                    }
-                  >
-
-                    <div className="review-case-top">
-
+                  <div className="review-queue-meta">
+                    <span>
+                      Priority{" "}
                       <strong>
-                        {item.case_id}
+                        {formatScore(
+                          item.priority_score,
+                        )}
                       </strong>
+                    </span>
 
-                      <span
-                        className={
-                          `review-risk-badge ${
-                            String(
-                              item.risk_level || ""
-                            ).toLowerCase()
-                          }`
-                        }
-                      >
-                        {item.risk_level ||
-                          "UNKNOWN"}
-                      </span>
+                    <span>
+                      {item.record_id ||
+                        "No record ID"}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </aside>
 
-                    </div>
+          {/* -------------------------------------------- */}
+          {/* CASE DETAIL                                  */}
+          {/* -------------------------------------------- */}
 
-                    <div className="review-case-middle">
+          {selectedCase && (
+            <main className="review-detail-panel">
+              {/* CASE HEADER */}
 
-                      <span>
-                        {item.category ||
-                          "Transaction Exception"}
-                      </span>
-
-                      <span>
-                        Priority:{" "}
-                        {item.priority_score ??
-                          "—"}
-                      </span>
-
-                    </div>
-
-                    <div className="review-case-bottom">
-
-                      <span>
-                        {item.case_status ||
-                          "PENDING_REVIEW"}
-                      </span>
-
-                      <span>
-                        {item.human_review_required
-                          ? "Review Required"
-                          : ""}
-                      </span>
-
-                    </div>
-
-                  </button>
-
-                ))}
-
-              </div>
-            )}
-
-          </div>
-
-          {/* REVIEW PANEL */}
-
-          <div className="review-panel">
-
-            {!selectedCase ? (
-
-              <div className="review-panel-empty">
-
-                <div className="review-empty-icon">
-                  ✓
-                </div>
-
-                <h2>
-                  Select a case
-                </h2>
-
-                <p>
-                  Choose a pending case from the
-                  review queue to begin your analysis.
-                </p>
-
-              </div>
-
-            ) : (
-
-              <>
-
-                {/* CASE HEADER */}
-
-                <div className="review-detail-header">
-
-                  <div>
-
-                    <span>CASE</span>
-
-                    <h2>
-                      {selectedCase.case_id}
-                    </h2>
-
+              <div className="review-case-header">
+                <div>
+                  <div className="review-case-id">
+                    {selectedCase.case_id}
                   </div>
 
-                  <button
-                    type="button"
-                    className="review-investigate-button"
-                    onClick={() =>
-                      navigate(
-                        `/investigation/${selectedCase.case_id}`
-                      )
-                    }
+                  <h2>
+                    {getCategoryLabel(
+                      selectedCase.category,
+                    )}
+                  </h2>
+
+                  <p>
+                    {selectedCase.record_type ||
+                      "Record"}{" "}
+                    ·{" "}
+                    {selectedCase.record_id ||
+                      "Unknown record"}
+                  </p>
+                </div>
+
+                <div className="review-case-status">
+                  <span
+                    className={`review-risk-badge ${getRiskClass(
+                      selectedCase.risk_level,
+                    )}`}
                   >
-                    View Investigation
-                  </button>
+                    {selectedCase.risk_level}
+                  </span>
 
+                  <span className="review-status-badge">
+                    {selectedCase.case_status}
+                  </span>
+                </div>
+              </div>
+
+              {/* CASE INFORMATION */}
+
+              <section className="review-section">
+                <div className="review-section-heading">
+                  <div>
+                    <span className="review-section-kicker">
+                      CASE CONTEXT
+                    </span>
+
+                    <h3>
+                      Case Information
+                    </h3>
+                  </div>
                 </div>
 
-                {/* CASE INFORMATION */}
-
-                <div className="review-detail-grid">
-
-                  <div>
-                    <span>Risk Level</span>
+                <div className="review-info-grid">
+                  <div className="review-info-item">
+                    <span>Invoice ID</span>
                     <strong>
-                      {selectedCase.risk_level ||
+                      {selectedCase.invoice_id ||
                         "—"}
                     </strong>
                   </div>
 
-                  <div>
-                    <span>Priority Score</span>
+                  <div className="review-info-item">
+                    <span>Payment ID</span>
                     <strong>
-                      {selectedCase.priority_score ??
+                      {selectedCase.payment_id ||
                         "—"}
                     </strong>
                   </div>
 
-                  <div>
-                    <span>Exception</span>
+                  <div className="review-info-item">
+                    <span>Record Type</span>
                     <strong>
-                      {selectedCase.category ||
+                      {selectedCase.record_type ||
                         "—"}
                     </strong>
                   </div>
 
-                  <div>
+                  <div className="review-info-item">
+                    <span>Record ID</span>
+                    <strong>
+                      {selectedCase.record_id ||
+                        "—"}
+                    </strong>
+                  </div>
+
+                  <div className="review-info-item">
                     <span>AI Decision</span>
                     <strong>
                       {selectedCase.decision ||
-                        "INVESTIGATE"}
+                        "—"}
                     </strong>
                   </div>
 
-                  <div>
-                    <span>Outstanding</span>
+                  <div className="review-info-item">
+                    <span>AI Confidence</span>
                     <strong>
-                      $
-                      {Number(
-                        selectedCase.outstanding_amount ||
-                        0
-                      ).toFixed(2)}
+                      {formatConfidence(
+                        selectedCase.decision_confidence,
+                      )}
                     </strong>
                   </div>
+                </div>
+              </section>
 
+              {/* FINANCIAL IMPACT */}
+
+              <section className="review-section">
+                <div className="review-section-heading">
                   <div>
-                    <span>Payment Coverage</span>
-                    <strong>
-                      {selectedCase.payment_coverage_percent !=
-                      null
-                        ? `${Number(
-                            selectedCase.payment_coverage_percent
-                          ).toFixed(2)}%`
-                        : "—"}
-                    </strong>
+                    <span className="review-section-kicker">
+                      FINANCIAL ANALYSIS
+                    </span>
+
+                    <h3>
+                      Financial Impact
+                    </h3>
                   </div>
 
+                  <span className="review-financial-status">
+                    {selectedCase.financial_status ||
+                      "UNKNOWN"}
+                  </span>
                 </div>
 
-                {/* AI SUMMARY */}
+                <div className="review-metrics-detail">
+                  <MetricCard
+                    label="Invoice Amount"
+                    value={formatCurrency(
+                      selectedCase.invoice_amount,
+                      selectedCase.currency,
+                    )}
+                  />
 
-                <div className="review-ai-box">
+                  <MetricCard
+                    label="Payment Amount"
+                    value={formatCurrency(
+                      selectedCase.payment_amount,
+                      selectedCase.currency,
+                    )}
+                  />
 
-                  <div className="review-ai-title">
-                    AI Investigation Summary
+                  <MetricCard
+                    label="Bank Amount"
+                    value={formatCurrency(
+                      selectedCase.bank_amount,
+                      selectedCase.currency,
+                    )}
+                  />
+
+                  <MetricCard
+                    label="Outstanding"
+                    value={formatCurrency(
+                      selectedCase.outstanding_amount,
+                      selectedCase.currency,
+                    )}
+                    emphasis={
+                      selectedCase.outstanding_amount >
+                      0
+                        ? "review-metric-warning"
+                        : ""
+                    }
+                  />
+
+                  <MetricCard
+                    label="Payment Coverage"
+                    value={formatPercent(
+                      selectedCase.payment_coverage_percent,
+                    )}
+                  />
+
+                  <MetricCard
+                    label="Priority"
+                    value={formatScore(
+                      selectedCase.priority_score,
+                    )}
+                    supporting="Risk prioritization score"
+                  />
+                </div>
+
+                {selectedCase.financial_impact && (
+                  <div className="review-impact-callout">
+                    <span>
+                      Financial Impact
+                    </span>
+
+                    <strong>
+                      {selectedCase.financial_impact.replaceAll(
+                        "_",
+                        " ",
+                      )}
+                    </strong>
+                  </div>
+                )}
+              </section>
+
+              {/* AI INVESTIGATION */}
+
+              <section className="review-section review-ai-section">
+                <div className="review-section-heading">
+                  <div>
+                    <span className="review-section-kicker">
+                      EXPLAINABLE AI
+                    </span>
+
+                    <h3>
+                      Investigation
+                    </h3>
                   </div>
 
-                  <div className="review-ai-row">
+                  <div className="review-confidence">
+                    <span>
+                      AI Confidence
+                    </span>
 
-                    <span>Finding</span>
+                    <strong>
+                      {formatConfidence(
+                        selectedCase.investigation_confidence,
+                      )}
+                    </strong>
+                  </div>
+                </div>
+
+                {selectedCase.investigation_finding && (
+                  <div className="review-ai-finding">
+                    <span className="review-ai-label">
+                      FINDING
+                    </span>
 
                     <p>
-                      {selectedCase.investigation_finding ||
-                        selectedCase.reason ||
-                        "Review the complete investigation before making a decision."}
+                      {
+                        selectedCase.investigation_finding
+                      }
                     </p>
+                  </div>
+                )}
 
+                <div className="review-ai-grid">
+                  <div className="review-ai-card">
+                    <span className="review-ai-label">
+                      LIKELY CAUSE
+                    </span>
+
+                    <p>
+                      {selectedCase.likely_cause ||
+                        "No cause identified."}
+                    </p>
                   </div>
 
-                  <div className="review-ai-row">
-
-                    <span>
-                      Recommended Action
+                  <div className="review-ai-card">
+                    <span className="review-ai-label">
+                      RECOMMENDED ACTION
                     </span>
 
                     <p>
                       {selectedCase.recommended_action ||
-                        selectedCase.suggested_action ||
-                        "See the case investigation for the AI recommendation."}
+                        "No recommendation available."}
                     </p>
-
                   </div>
-
                 </div>
 
-                {/* DECISION */}
+                {/* EVIDENCE */}
 
-                <div className="review-decision-section">
+                <div className="review-evidence-section">
+                  <div className="review-subheading">
+                    <h4>
+                      Evidence
+                    </h4>
 
-                  <h3>
-                    Reviewer Decision
-                  </h3>
-
-                  <p>
-                    The final decision is made by the
-                    human reviewer, not automatically
-                    by the AI.
-                  </p>
-
-                  <div className="review-decision-buttons">
-
-                    <button
-                      type="button"
-                      className={
-                        decision === "APPROVE"
-                          ? "review-decision-button approve selected"
-                          : "review-decision-button approve"
-                      }
-                      onClick={() =>
-                        setDecision("APPROVE")
-                      }
-                      disabled={submitting}
-                    >
-                      APPROVE
-                    </button>
-
-                    <button
-                      type="button"
-                      className={
-                        decision === "REJECT"
-                          ? "review-decision-button reject selected"
-                          : "review-decision-button reject"
-                      }
-                      onClick={() =>
-                        setDecision("REJECT")
-                      }
-                      disabled={submitting}
-                    >
-                      REJECT
-                    </button>
-
-                    <button
-                      type="button"
-                      className={
-                        decision === "ESCALATE"
-                          ? "review-decision-button escalate selected"
-                          : "review-decision-button escalate"
-                      }
-                      onClick={() =>
-                        setDecision("ESCALATE")
-                      }
-                      disabled={submitting}
-                    >
-                      ESCALATE
-                    </button>
-
+                    <span>
+                      {selectedCase.evidence
+                        ?.length || 0}{" "}
+                      signals
+                    </span>
                   </div>
 
+                  <div className="review-evidence-grid">
+                    {(
+                      selectedCase.evidence ||
+                      []
+                    ).map(
+                      (item, index) => (
+                        <EvidenceCard
+                          key={`${item.label}-${index}`}
+                          item={item}
+                        />
+                      ),
+                    )}
+                  </div>
                 </div>
 
-                {/* COMMENT */}
+                {/* REASONING */}
 
-                <div className="review-comment-section">
+                {selectedCase.reasoning_steps && (
+                  <div className="review-reasoning">
+                    <div className="review-subheading">
+                      <h4>
+                        Investigation Reasoning
+                      </h4>
+                    </div>
 
+                    <ol>
+                      {parseReasoning(
+                        selectedCase.reasoning_steps,
+                      ).map(
+                        (step, index) => (
+                          <li
+                            key={`${step}-${index}`}
+                          >
+                            <span>
+                              {index + 1}
+                            </span>
+
+                            <p>{step}</p>
+                          </li>
+                        ),
+                      )}
+                    </ol>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="review-investigation-button"
+                  onClick={() =>
+                    navigate(
+                      `/investigation/${selectedCase.case_id}`,
+                    )
+                  }
+                >
+                  Open Full Investigation
+                  <span>→</span>
+                </button>
+              </section>
+
+              {/* HUMAN DECISION */}
+
+              <section className="review-decision-section">
+                <div className="review-section-heading">
+                  <div>
+                    <span className="review-section-kicker">
+                      HUMAN GOVERNANCE
+                    </span>
+
+                    <h3>
+                      Final Decision
+                    </h3>
+
+                    <p>
+                      AI provides the recommendation.
+                      The analyst owns the final
+                      decision.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="review-decision-options">
+                  <button
+                    type="button"
+                    className={`review-decision-option approve ${
+                      decision === "APPROVE"
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setDecision("APPROVE")
+                    }
+                    disabled={submitting}
+                  >
+                    <span className="review-decision-icon">
+                      ✓
+                    </span>
+
+                    <span>
+                      <strong>
+                        Approve
+                      </strong>
+
+                      <small>
+                        Accept the case resolution
+                      </small>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`review-decision-option reject ${
+                      decision === "REJECT"
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setDecision("REJECT")
+                    }
+                    disabled={submitting}
+                  >
+                    <span className="review-decision-icon">
+                      ×
+                    </span>
+
+                    <span>
+                      <strong>
+                        Reject
+                      </strong>
+
+                      <small>
+                        Reject the AI resolution
+                      </small>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`review-decision-option escalate ${
+                      decision === "ESCALATE"
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setDecision("ESCALATE")
+                    }
+                    disabled={submitting}
+                  >
+                    <span className="review-decision-icon">
+                      ↗
+                    </span>
+
+                    <span>
+                      <strong>
+                        Escalate
+                      </strong>
+
+                      <small>
+                        Send for deeper investigation
+                      </small>
+                    </span>
+                  </button>
+                </div>
+
+                <div className="review-comment-area">
                   <label htmlFor="review-comment">
-                    Reviewer Comment
+                    Analyst Comment
                   </label>
 
                   <textarea
                     id="review-comment"
                     value={comment}
                     onChange={(event) =>
-                      setComment(event.target.value)
+                      setComment(
+                        event.target.value,
+                      )
                     }
-                    placeholder="Enter your review comments..."
-                    rows={5}
+                    placeholder="Document why this decision was made..."
+                    maxLength={2000}
                     disabled={submitting}
                   />
 
+                  <div className="review-comment-footer">
+                    <span>
+                      {comment.length} / 2000
+                    </span>
+                  </div>
                 </div>
 
-                {/* SUBMIT */}
+                <div className="review-submit-row">
+                  <div>
+                    <span className="review-submit-label">
+                      SELECTED DECISION
+                    </span>
 
-                <div className="review-submit-area">
+                    <strong>
+                      {decision}
+                    </strong>
+                  </div>
 
                   <button
                     type="button"
                     className="review-submit-button"
-                    onClick={handleSubmitReview}
-                    disabled={
-                      submitting ||
-                      !decision
-                    }
+                    onClick={handleSubmit}
+                    disabled={submitting}
                   >
                     {submitting
-                      ? "Submitting..."
-                      : "Submit Review"}
+                      ? "Recording Decision..."
+                      : "Submit Human Decision"}
+
+                    {!submitting && (
+                      <span>→</span>
+                    )}
                   </button>
-
                 </div>
-
-              </>
-
-            )}
-
-          </div>
-
+              </section>
+            </main>
+          )}
         </div>
-
-      </div>
-
+      )}
     </div>
   );
 }
-
-export default Review;
