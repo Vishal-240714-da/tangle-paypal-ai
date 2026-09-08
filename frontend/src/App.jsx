@@ -12,6 +12,7 @@ import Review from "./pages/Review";
 import Analytics from "./pages/Analytics";
 import DataQuality from "./pages/DataQuality";
 import Reconciliation from "./pages/Reconciliation";
+import AuditTrail from "./pages/AuditTrail";
 
 import Layout from "./components/Layout";
 
@@ -75,6 +76,15 @@ function App() {
           <Route
             path="/review"
             element={<Review />}
+          />
+
+          {/* ==================================================
+              AUDIT TRAIL
+              ================================================== */}
+
+          <Route
+            path="/audit"
+            element={<AuditTrail />}
           />
 
           {/* ==================================================

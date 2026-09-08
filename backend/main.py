@@ -1,17 +1,21 @@
+
 import logging
 import os
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
 
-from backend.routes import dashboard
-from backend.routes import cases
-from backend.routes import investigation
-from backend.routes import review
-from backend.routes import analytics
-from backend.routes import data_quality
-from backend.routes.reconciliation import router as reconciliation_router
+from backend.routes import (
+    analytics,
+    audit,
+    cases,
+    dashboard,
+    data_quality,
+    investigation,
+    reconciliation,
+    review,
+)
 
 
 # ============================================================
@@ -25,11 +29,17 @@ load_dotenv()
 # LOGGING
 # ============================================================
 
+LOG_LEVEL = os.getenv(
+    "LOG_LEVEL",
+    "INFO",
+).upper()
+
 logging.basicConfig(
-    level=os.getenv(
-        "LOG_LEVEL",
-        "INFO",
-    ).upper(),
+    level=getattr(
+        logging,
+        LOG_LEVEL,
+        logging.INFO,
+    ),
     format=(
         "%(asctime)s | "
         "%(levelname)s | "
@@ -38,35 +48,12 @@ logging.basicConfig(
     ),
 )
 
-
 logger = logging.getLogger(__name__)
 
 
 # ============================================================
-# TANGLE FASTAPI APPLICATION
+# CORS
 # ============================================================
-
-app = FastAPI(
-    title="TANGLE API",
-    description=(
-        "Transaction Anomaly & "
-        "Governance Ledger Engine"
-    ),
-    version="1.0.0",
-)
-
-
-# ============================================================
-# CORS CONFIGURATION
-# ============================================================
-
-# Read allowed frontend origins from the environment.
-#
-# Example:
-#
-# TANGLE_CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-#
-# Multiple origins are separated by commas.
 
 cors_origins_raw = os.getenv(
     "TANGLE_CORS_ORIGINS",
@@ -80,6 +67,24 @@ cors_origins = [
 ]
 
 
+# ============================================================
+# FASTAPI APPLICATION
+# ============================================================
+
+app = FastAPI(
+    title="TANGLE API",
+    description=(
+        "Transaction Anomaly & Governance "
+        "Ledger Engine API"
+    ),
+    version="1.0.0",
+)
+
+
+# ============================================================
+# CORS MIDDLEWARE
+# ============================================================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
@@ -90,7 +95,7 @@ app.add_middleware(
 
 
 # ============================================================
-# API ROUTES
+# ROUTERS
 # ============================================================
 
 app.include_router(
@@ -112,15 +117,22 @@ app.include_router(
 app.include_router(
     analytics.router
 )
+
 app.include_router(
     data_quality.router
 )
 
 app.include_router(
-    reconciliation_router
+    reconciliation.router
 )
+
+app.include_router(
+    audit.router
+)
+
+
 # ============================================================
-# ROOT ENDPOINT
+# ROOT
 # ============================================================
 
 @app.get(
@@ -129,12 +141,12 @@ app.include_router(
 )
 def root():
     return {
-        "application": "TANGLE",
-        "full_name": (
+        "name": "TANGLE",
+        "description": (
             "Transaction Anomaly & "
             "Governance Ledger Engine"
         ),
-        "status": "operational",
+        "status": "running",
         "version": "1.0.0",
     }
 
@@ -147,7 +159,34 @@ def root():
     "/health",
     summary="Health check",
 )
-def health_check():
+def health():
     return {
         "status": "healthy",
+        "service": "tangle-api",
     }
+
+
+# ============================================================
+# STARTUP
+# ============================================================
+
+@app.on_event("startup")
+def startup_event():
+    logger.info(
+        "TANGLE API started successfully."
+    )
+    logger.info(
+        "CORS origins: %s",
+        cors_origins,
+    )
+
+
+# ============================================================
+# SHUTDOWN
+# ============================================================
+
+@app.on_event("shutdown")
+def shutdown_event():
+    logger.info(
+        "TANGLE API shutting down."
+    )

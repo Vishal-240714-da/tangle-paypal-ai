@@ -104,6 +104,21 @@ function Sidebar() {
         </NavLink>
 
 
+        {/* AUDIT TRAIL */}
+
+        <NavLink
+          to="/audit"
+          className={({ isActive }) =>
+            isActive
+              ? "nav-item active"
+              : "nav-item"
+          }
+        >
+          <span>◌</span>
+          Audit Trail
+        </NavLink>
+
+
         {/* ANALYTICS */}
 
         <NavLink
