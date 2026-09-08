@@ -1,0 +1,13 @@
+record_type,record_id,amount,category,confidence,suggested_action
+INVOICE,INV-0004,1000.0,MISSING_PAYMENT,0.0,Investigate unpaid invoice.
+INVOICE,INV-0006,15000.0,MISSING_PAYMENT,0.0,Investigate unpaid invoice.
+INVOICE,INV-0007,15000.0,MISSING_PAYMENT,0.0,Investigate unpaid invoice.
+INVOICE,INV-0011,1500.0,MISSING_PAYMENT,0.0,Investigate unpaid invoice.
+INVOICE,INV-0013,50000.0,MISSING_PAYMENT,0.0,Investigate unpaid invoice.
+INVOICE,INV-0089,5000.0,MISSING_PAYMENT,0.0,Investigate unpaid invoice.
+INVOICE,INV-0093,1000.0,MISSING_PAYMENT,0.0,Investigate unpaid invoice.
+PAYMENT,PAY-D28B979C,972.39,UNEXPLAINED_PAYMENT,0.0,Investigate payment against ERP.
+PAYMENT,PAY-C4B08141,807.8,UNEXPLAINED_PAYMENT,0.0,Investigate payment against ERP.
+BANK,BANK-598E9FBD,972.39,UNRECONCILED_BANK,0.0,Investigate bank deposit.
+BANK,BANK-4C8919FA,807.8,UNRECONCILED_BANK,0.0,Investigate bank deposit.
+BANK,BANK-D7A93516,37500.0,UNKNOWN_DEPOSIT,0.0,Investigate bank deposit.

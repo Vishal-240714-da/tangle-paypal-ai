@@ -1,16 +1,21 @@
-# Python
+# ==============================
+# TANGLE - Root Git Ignore
+# ==============================
+
+# Python cache
 __pycache__/
 *.py[cod]
 *.pyo
 
-# Virtual environment
+# Virtual environments
 venv/
 .venv/
 env/
 
-# Environment variables
+# Environment variables / secrets
 .env
 .env.*
+!.env.example
 
 # IDE
 .idea/
@@ -23,12 +28,35 @@ Thumbs.db
 # Logs
 *.log
 
-# Database/local runtime files
+# Local databases
 *.db
 *.sqlite
 *.sqlite3
 
-# Generated files
+# Generated/runtime files
 uploads/
 outputs/
 temp/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+
+# Build/package artifacts
+build/
+dist/
+*.egg-info/
+
+# Frontend dependencies/build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Local development files
+*.local

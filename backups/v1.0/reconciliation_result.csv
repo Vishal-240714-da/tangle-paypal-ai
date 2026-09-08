@@ -1,0 +1,121 @@
+invoice_id,payment_id,bank_transaction_id,pass,match_type,confidence,rationale
+INV-0016,PAY-1D56C95A,BANK-ABA49637,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0017,PAY-63D25156,BANK-824016CA,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0018,PAY-622090F4,BANK-B4239050,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0019,PAY-5C7AC1F4,BANK-F1750216,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0020,PAY-B0074718,BANK-BA1DD5F4,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0021,PAY-F68E4241,BANK-1980BCEB,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0022,PAY-44B82860,BANK-A0893083,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0024,PAY-55B7D273,BANK-B6216B1A,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0025,PAY-D0298952,BANK-C671033B,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0026,PAY-B09B56F6,BANK-27672498,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0027,PAY-0F6C0525,BANK-E94AE873,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0028,PAY-4123C8A2,BANK-E905715D,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0029,PAY-8AD90C52,BANK-65A98E38,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0030,PAY-25BF07E6,BANK-51158B3B,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0032,PAY-1520CFC4,BANK-95B34A8B,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0033,PAY-F4A597A3,BANK-9C231EF4,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0034,PAY-CEF33EB3,BANK-643801D2,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0036,PAY-CA25E438,BANK-B0A1292B,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0037,PAY-601BE9FD,BANK-C48D89D9,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0038,PAY-91C199DE,BANK-B392D108,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0039,PAY-B936930A,BANK-F9E19552,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0041,PAY-2A51EF8D,BANK-C3621F58,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0042,PAY-F704529D,BANK-4F2799F9,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0043,PAY-09D7DC48,BANK-7F5334BF,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0044,PAY-8A2158C2,BANK-1F34553D,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0047,PAY-34101526,BANK-BD1B986F,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0048,PAY-6B433312,BANK-1D180C7B,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0049,PAY-88D439BB,BANK-28E51EBF,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0050,PAY-34187E97,BANK-F8C204F8,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0051,PAY-F10D04F7,BANK-44FA17AA,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0052,PAY-6DDD53BD,BANK-AA3F23B8,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0053,PAY-6EEDEE70,BANK-B7E3AFEB,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0055,PAY-CD7B2B4E,BANK-FF3991B0,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0057,PAY-37A90A27,BANK-56611D89,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0058,PAY-E0B47F3E,BANK-D89E11C0,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0059,PAY-018F8FC4,BANK-6D95D6CC,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0060,PAY-AE668D7A,BANK-34F2435D,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0061,PAY-FF85BD4D,BANK-1B9AD5B7,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0062,PAY-8B73D8E2,BANK-0D7A540D,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0063,PAY-64929CF0,BANK-FCA16760,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0064,PAY-A3A4DB30,BANK-D6280A02,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0065,PAY-E264B145,BANK-A1960CC1,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0066,PAY-42A8763D,BANK-5CB0A454,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0067,PAY-BA8B8DC9,BANK-1304C484,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0068,PAY-D26E03F3,BANK-78457A49,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0069,PAY-AFF39E45,BANK-5253718D,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0070,PAY-BAFB8EDA,BANK-A60E396F,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0072,PAY-F4B89880,BANK-A970159E,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0073,PAY-65BFC04A,BANK-C83BD26F,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0074,PAY-007235C1,BANK-BAC22FE2,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0075,PAY-4B435F9A,BANK-54A7C80B,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0076,PAY-92D1B9A4,BANK-6FEEB18C,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0077,PAY-DAC619FB,BANK-992E6961,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0078,PAY-4F956F3B,BANK-6EDBFDCE,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0079,PAY-ADDACD12,BANK-D1B92B19,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0083,PAY-E2963F19,BANK-0691BB41,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0085,PAY-1645BA92,BANK-2A627C33,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0086,PAY-32AB2E58,BANK-41D8326B,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0087,PAY-0D795E20,BANK-18CD134E,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0088,PAY-48298386,BANK-27642C5F,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0090,PAY-598882BF,BANK-01984AE7,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0091,PAY-83470974,BANK-6B9DB86A,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0092,PAY-9369D533,BANK-62D34D35,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0094,PAY-2C99344D,BANK-FDFC65EE,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0095,PAY-FC1A8EC5,BANK-9B02F82A,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0096,PAY-D05DC417,BANK-8239C16D,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0097,PAY-6CC705A6,BANK-45486CA3,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0098,PAY-263DAFC7,BANK-1B82ED00,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0099,PAY-4623860B,BANK-426766AF,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0100,PAY-4EF57692,BANK-861318C6,1,EXACT,1.0,Exact invoice reference and amount match.
+INV-0023,PAY-B6A15CE0,BANK-AEC87D81,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0031,PAY-8FE093B3,BANK-2DCAA29B,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0035,PAY-57EE3293,BANK-966A8DC1,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0040,PAY-5D876ED3,BANK-1DE7B49D,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0045,PAY-4AC2E73E,BANK-FAC2EA0D,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0046,PAY-DA14DBCA,BANK-D0ED90E9,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0054,PAY-D23B8C03,BANK-5A98C18C,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0056,PAY-AFEC6CBE,BANK-EE47EBF1,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0071,PAY-0BB6F037,BANK-01CA740F,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0080,PAY-E5F7D3DD,BANK-0DA0DA65,2,FUZZY,0.938,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0081,PAY-493BC0BA,BANK-F645C8C9,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0082,PAY-0E470314,BANK-018AB7C5,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0084,PAY-0D64F821,BANK-1EE18E87,2,FUZZY,1.0,"Matched using reference similarity, date proximity and amount tolerance."
+INV-0001,PAY-0EE374CA,BANK-EFA8E734,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0002,PAY-0EE374CA,BANK-EFA8E734,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0010,PAY-0EE374CA,BANK-EFA8E734,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0008,PAY-82BDC106,BANK-B0720656,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0012,PAY-82BDC106,BANK-B0720656,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0005,PAY-7AD6165B,BANK-3AD1A19B,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-7AD6165B,BANK-3AD1A19B,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0005,PAY-D2C5FE4E,BANK-AF47C9AC,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-D2C5FE4E,BANK-AF47C9AC,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0005,PAY-33ABF343,BANK-51240559,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0012,PAY-33ABF343,BANK-51240559,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-33ABF343,BANK-51240559,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0005,PAY-F707B97C,BANK-AB7602F8,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0012,PAY-F707B97C,BANK-AB7602F8,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0005,PAY-ED50C94E,BANK-9D812155,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-ED50C94E,BANK-9D812155,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0005,PAY-EA2B1981,BANK-26D196A7,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0012,PAY-EA2B1981,BANK-26D196A7,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-EA2B1981,BANK-26D196A7,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0001,PAY-E28655C0,BANK-48349E47,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0002,PAY-E28655C0,BANK-48349E47,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0003,PAY-E28655C0,BANK-48349E47,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0001,PAY-25BD2AD6,BANK-99305F6B,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0003,PAY-25BD2AD6,BANK-99305F6B,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0005,PAY-25BD2AD6,BANK-99305F6B,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0003,PAY-0E907BD6,BANK-C68E81EB,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0008,PAY-0E907BD6,BANK-C68E81EB,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0009,PAY-0E907BD6,BANK-C68E81EB,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0001,PAY-EADC0C0A,BANK-02C6A757,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-EADC0C0A,BANK-02C6A757,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0009,PAY-EC678721,BANK-3B4D456A,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-EC678721,BANK-3B4D456A,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0015,PAY-EC678721,BANK-3B4D456A,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0001,PAY-3C9E1628,BANK-2C1D5C5C,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0002,PAY-3C9E1628,BANK-2C1D5C5C,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0012,PAY-C33F9FE7,BANK-9E1FDCA7,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
+INV-0014,PAY-C33F9FE7,BANK-9E1FDCA7,2,MERGED_PAYMENT,0.92,Multiple invoice amounts combine to the payment amount.
