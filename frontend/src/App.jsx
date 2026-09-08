@@ -1,3 +1,4 @@
+
 import {
   BrowserRouter,
   Routes,
@@ -9,16 +10,14 @@ import Cases from "./pages/Cases";
 import Investigation from "./pages/Investigation";
 import Review from "./pages/Review";
 import Analytics from "./pages/Analytics";
+import DataQuality from "./pages/DataQuality";
 
 import Layout from "./components/Layout";
 
 import "./App.css";
 
-
 function App() {
-
   return (
-
     <BrowserRouter>
 
       <Layout>
@@ -27,7 +26,7 @@ function App() {
 
           {/* ==================================================
               DASHBOARD
-          ================================================== */}
+              ================================================== */}
 
           <Route
             path="/"
@@ -37,7 +36,7 @@ function App() {
 
           {/* ==================================================
               CASES
-          ================================================== */}
+              ================================================== */}
 
           <Route
             path="/cases"
@@ -46,8 +45,18 @@ function App() {
 
 
           {/* ==================================================
+              DATA QUALITY
+              ================================================== */}
+
+          <Route
+            path="/data-quality"
+            element={<DataQuality />}
+          />
+
+
+          {/* ==================================================
               INVESTIGATION
-          ================================================== */}
+              ================================================== */}
 
           <Route
             path="/investigation/:caseId"
@@ -57,7 +66,7 @@ function App() {
 
           {/* ==================================================
               HUMAN REVIEW
-          ================================================== */}
+              ================================================== */}
 
           <Route
             path="/review"
@@ -67,7 +76,7 @@ function App() {
 
           {/* ==================================================
               ANALYTICS
-          ================================================== */}
+              ================================================== */}
 
           <Route
             path="/analytics"
@@ -77,7 +86,7 @@ function App() {
 
           {/* ==================================================
               UNKNOWN ROUTE
-          ================================================== */}
+              ================================================== */}
 
           <Route
             path="*"
@@ -105,10 +114,7 @@ function App() {
       </Layout>
 
     </BrowserRouter>
-
   );
-
 }
-
 
 export default App;

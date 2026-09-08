@@ -1,67 +1,115 @@
+
 import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   return (
     <aside className="sidebar">
 
+      {/* ==================================================
+          LOGO
+          ================================================== */}
+
       <div className="sidebar-logo">
-        <div className="logo-mark">T</div>
+
+        <div className="logo-mark">
+          T
+        </div>
 
         <div>
           <h2>TANGLE</h2>
           <span>Finance Intelligence</span>
         </div>
+
       </div>
+
+
+      {/* ==================================================
+          NAVIGATION
+          ================================================== */}
 
       <nav className="sidebar-nav">
 
         <NavLink
           to="/"
           className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
+            isActive
+              ? "nav-item active"
+              : "nav-item"
           }
         >
-          <span>📊</span>
+          <span>▦</span>
           Dashboard
         </NavLink>
+
 
         <NavLink
           to="/cases"
           className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
+            isActive
+              ? "nav-item active"
+              : "nav-item"
           }
         >
-          <span>📁</span>
+          <span>□</span>
           Cases
         </NavLink>
+
+
+        <NavLink
+          to="/data-quality"
+          className={({ isActive }) =>
+            isActive
+              ? "nav-item active"
+              : "nav-item"
+          }
+        >
+          <span>✓</span>
+          Data Quality
+        </NavLink>
+
 
         <NavLink
           to="/review"
           className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
+            isActive
+              ? "nav-item active"
+              : "nav-item"
           }
         >
-          <span>👤</span>
+          <span>◉</span>
           Human Review
         </NavLink>
+
 
         <NavLink
           to="/analytics"
           className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
+            isActive
+              ? "nav-item active"
+              : "nav-item"
           }
         >
-          <span>📈</span>
+          <span>↗</span>
           Analytics
         </NavLink>
 
       </nav>
 
+
+      {/* ==================================================
+          SYSTEM STATUS
+          ================================================== */}
+
       <div className="sidebar-footer">
+
         <div className="system-status">
+
           <span className="status-dot"></span>
+
           System Operational
+
         </div>
+
       </div>
 
     </aside>

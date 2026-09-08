@@ -10,6 +10,7 @@ from backend.routes import cases
 from backend.routes import investigation
 from backend.routes import review
 from backend.routes import analytics
+from backend.routes import data_quality
 
 
 # ============================================================
@@ -110,7 +111,9 @@ app.include_router(
 app.include_router(
     analytics.router
 )
-
+app.include_router(
+    data_quality.router
+)
 
 # ============================================================
 # ROOT ENDPOINT

@@ -1,3 +1,4 @@
+
 /* ============================================================
    TANGLE - GLOBAL APPLICATION STYLES
    ============================================================ */
@@ -125,6 +126,17 @@ body {
   font-size: 14px;
 
   transition: 0.2s;
+}
+
+.nav-item span {
+  width: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .nav-item:hover {
@@ -1426,6 +1438,1005 @@ body {
 
 
 /* ============================================================
+   ANALYTICS PAGE
+   ============================================================ */
+
+.analytics-summary-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, 1fr);
+
+  gap: 16px;
+
+  margin-bottom: 24px;
+}
+
+.analytics-card {
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  padding: 20px;
+}
+
+.analytics-card span {
+  display: block;
+
+  font-size: 13px;
+
+  color: #6b7280;
+
+  margin-bottom: 10px;
+}
+
+.analytics-card strong {
+  display: block;
+
+  font-size: 27px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.analytics-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+.analytics-section {
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  padding: 22px;
+}
+
+.analytics-section-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+.analytics-section-header h2 {
+  margin: 0 0 5px 0;
+
+  font-size: 18px;
+
+  color: #111827;
+}
+
+.analytics-section-header p {
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #6b7280;
+}
+
+.analytics-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.analytics-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 14px 15px;
+
+  background: #f9fafb;
+
+  border-radius: 8px;
+
+  border: 1px solid #f0f0f0;
+
+  color: #374151;
+
+  font-size: 14px;
+}
+
+.analytics-row strong {
+  font-size: 16px;
+
+  color: #111827;
+}
+
+.analytics-row-label {
+  display: flex;
+
+  align-items: center;
+}
+
+.analytics-risk-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  padding: 5px 10px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+}
+
+.analytics-risk-badge.critical {
+  background: #fee2e2;
+
+  color: #991b1b;
+}
+
+.analytics-risk-badge.high {
+  background: #ffedd5;
+
+  color: #9a3412;
+}
+
+.analytics-risk-badge.medium {
+  background: #fef3c7;
+
+  color: #92400e;
+}
+
+.analytics-risk-badge.low {
+  background: #dcfce7;
+
+  color: #166534;
+}
+
+.analytics-empty {
+  padding: 30px;
+
+  text-align: center;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.analytics-insight {
+  grid-column: span 2;
+}
+
+.analytics-insight-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 18px;
+}
+
+.analytics-insight-list > div {
+  padding: 16px;
+
+  background: #f9fafb;
+
+  border-radius: 9px;
+
+  border: 1px solid #f0f0f0;
+}
+
+.analytics-insight-list strong {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #111827;
+
+  font-size: 14px;
+}
+
+.analytics-insight-list p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   DATA QUALITY PAGE
+   ============================================================ */
+
+.data-quality-page {
+  width: 100%;
+}
+
+
+/* ============================================================
+   DATA QUALITY HEADER
+   ============================================================ */
+
+.dq-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+.dq-eyebrow {
+  margin-bottom: 8px;
+
+  color: #2563eb;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+.dq-header .page-header {
+  margin-bottom: 0;
+}
+
+.dq-refresh-button {
+  border: 1px solid #d1d5db;
+
+  background: white;
+
+  color: #374151;
+
+  padding: 10px 15px;
+
+  border-radius: 8px;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.dq-refresh-button:hover {
+  background: #f9fafb;
+
+  border-color: #9ca3af;
+}
+
+.dq-refresh-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+}
+
+
+/* ============================================================
+   DATA QUALITY LOADING / ERROR
+   ============================================================ */
+
+.dq-loading {
+  padding: 50px;
+
+  text-align: center;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.dq-message {
+  padding: 14px 16px;
+
+  border-radius: 8px;
+
+  margin-bottom: 15px;
+
+  font-size: 13px;
+}
+
+.dq-error {
+  background: #fef2f2;
+
+  border: 1px solid #fecaca;
+
+  color: #b91c1c;
+}
+
+
+/* ============================================================
+   DATA QUALITY HERO
+   ============================================================ */
+
+.dq-quality-hero {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  padding: 25px;
+
+  margin-bottom: 20px;
+}
+
+.dq-score-block {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+}
+
+.dq-score {
+  font-size: 42px;
+
+  line-height: 1;
+
+  font-weight: 800;
+}
+
+.dq-score.excellent {
+  color: #15803d;
+}
+
+.dq-score.good {
+  color: #2563eb;
+}
+
+.dq-score.warning {
+  color: #c2410c;
+}
+
+.dq-score.critical {
+  color: #b91c1c;
+}
+
+.dq-score-label {
+  color: #111827;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.04em;
+}
+
+.dq-score-description {
+  margin-top: 5px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+}
+
+.dq-quality-bar {
+  height: 9px;
+
+  margin-top: 24px;
+
+  background: #f3f4f6;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+.dq-quality-fill {
+  height: 100%;
+
+  border-radius: 999px;
+
+  transition: width 0.5s ease;
+}
+
+.dq-quality-fill.excellent {
+  background: #22c55e;
+}
+
+.dq-quality-fill.good {
+  background: #2563eb;
+}
+
+.dq-quality-fill.warning {
+  background: #f97316;
+}
+
+.dq-quality-fill.critical {
+  background: #ef4444;
+}
+
+
+/* ============================================================
+   DATA QUALITY KPI GRID
+   ============================================================ */
+
+.dq-kpi-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 22px;
+}
+
+.dq-kpi-card {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  padding: 20px;
+}
+
+.dq-kpi-card span {
+  display: block;
+
+  color: #6b7280;
+
+  font-size: 12px;
+
+  margin-bottom: 8px;
+}
+
+.dq-kpi-card strong {
+  display: block;
+
+  color: #111827;
+
+  font-size: 28px;
+
+  font-weight: 750;
+}
+
+.dq-kpi-card small {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+.dq-kpi-card.valid {
+  border-top: 3px solid #22c55e;
+}
+
+.dq-kpi-card.warning {
+  border-top: 3px solid #f59e0b;
+}
+
+.dq-kpi-card.error {
+  border-top: 3px solid #ef4444;
+}
+
+
+/* ============================================================
+   DATA QUALITY SECTIONS
+   ============================================================ */
+
+.dq-section {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  margin-bottom: 20px;
+
+  overflow: hidden;
+}
+
+.dq-section-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 20px 22px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dq-section-header h2 {
+  margin: 0 0 5px;
+
+  color: #111827;
+
+  font-size: 17px;
+}
+
+.dq-section-header p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   DATA QUALITY CHECKS
+   ============================================================ */
+
+.dq-check-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+}
+
+.dq-check-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 17px 20px;
+
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dq-check-row:nth-child(odd) {
+  border-right: 1px solid #f0f0f0;
+}
+
+.dq-check-icon {
+  width: 30px;
+
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+.dq-check-row.passed .dq-check-icon {
+  background: #dcfce7;
+
+  color: #15803d;
+}
+
+.dq-check-row.flagged .dq-check-icon {
+  background: #fef3c7;
+
+  color: #b45309;
+}
+
+.dq-check-content {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
+
+  flex: 1;
+}
+
+.dq-check-content strong {
+  color: #111827;
+
+  font-size: 13px;
+}
+
+.dq-check-content span {
+  color: #6b7280;
+
+  font-size: 11px;
+}
+
+.dq-check-status {
+  padding: 4px 8px;
+
+  border-radius: 5px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.04em;
+}
+
+.dq-check-status.pass {
+  background: #dcfce7;
+
+  color: #166534;
+}
+
+.dq-check-status.warning {
+  background: #fef3c7;
+
+  color: #92400e;
+}
+
+
+/* ============================================================
+   DATA QUALITY DATASETS
+   ============================================================ */
+
+.dq-dataset-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+
+  padding: 20px;
+}
+
+.dq-dataset-card {
+  padding: 18px;
+
+  background: #f9fafb;
+
+  border: 1px solid #eef0f2;
+
+  border-radius: 10px;
+}
+
+.dq-dataset-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 12px;
+}
+
+.dq-dataset-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #9ca3af;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+.dq-dataset-top h3 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 14px;
+}
+
+.dq-dataset-top > strong {
+  color: #15803d;
+
+  font-size: 16px;
+}
+
+.dq-mini-bar {
+  height: 6px;
+
+  margin: 16px 0;
+
+  background: #e5e7eb;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+.dq-mini-bar div {
+  height: 100%;
+
+  background: #22c55e;
+
+  border-radius: 999px;
+}
+
+.dq-dataset-stats {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  color: #6b7280;
+
+  font-size: 10px;
+}
+
+.dq-dataset-stats strong {
+  color: #374151;
+}
+
+
+/* ============================================================
+   DATA QUALITY DETECTED ISSUES
+   ============================================================ */
+
+.dq-issue-count {
+  padding: 5px 9px;
+
+  border-radius: 6px;
+
+  background: #fff7ed;
+
+  color: #c2410c;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+.dq-issues-table {
+  overflow-x: auto;
+}
+
+.dq-issue-header,
+.dq-issue-row {
+  display: grid;
+
+  grid-template-columns:
+    90px
+    150px
+    150px
+    190px
+    minmax(250px, 1fr);
+
+  min-width: 900px;
+
+  gap: 15px;
+
+  align-items: center;
+}
+
+.dq-issue-header {
+  padding: 12px 20px;
+
+  background: #f9fafb;
+
+  color: #6b7280;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+}
+
+.dq-issue-row {
+  padding: 15px 20px;
+
+  border-top: 1px solid #f0f0f0;
+
+  color: #4b5563;
+
+  font-size: 11px;
+}
+
+.dq-issue-row strong {
+  color: #111827;
+
+  font-size: 11px;
+}
+
+.dq-record-id {
+  font-family:
+    Consolas,
+    "Courier New",
+    monospace;
+
+  color: #374151;
+}
+
+.dq-issue-message {
+  overflow-wrap: anywhere;
+
+  line-height: 1.5;
+}
+
+.dq-severity {
+  display: inline-block;
+
+  padding: 4px 7px;
+
+  border-radius: 5px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+}
+
+.dq-severity.warning {
+  background: #fef3c7;
+
+  color: #92400e;
+}
+
+.dq-severity.error {
+  background: #fee2e2;
+
+  color: #b91c1c;
+}
+
+
+/* ============================================================
+   DATA QUALITY EMPTY STATE
+   ============================================================ */
+
+.dq-empty {
+  padding: 45px 20px;
+
+  text-align: center;
+}
+
+.dq-empty-icon {
+  width: 46px;
+
+  height: 46px;
+
+  margin: 0 auto 13px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #dcfce7;
+
+  color: #15803d;
+
+  font-size: 20px;
+
+  font-weight: 800;
+}
+
+.dq-empty strong {
+  display: block;
+
+  color: #111827;
+
+  font-size: 14px;
+}
+
+.dq-empty p {
+  margin: 7px 0 0;
+
+  color: #6b7280;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   DATA QUALITY MILESTONE
+   ============================================================ */
+
+.dq-milestone {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 22px;
+
+  margin-top: 4px;
+
+  margin-bottom: 10px;
+
+  background: #111827;
+
+  border-radius: 12px;
+
+  color: white;
+}
+
+.dq-milestone-icon {
+  width: 44px;
+
+  height: 44px;
+
+  flex: 0 0 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #2563eb;
+
+  font-size: 18px;
+
+  font-weight: 800;
+}
+
+.dq-milestone-label {
+  margin-bottom: 5px;
+
+  color: #93c5fd;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+}
+
+.dq-milestone h2 {
+  margin: 0;
+
+  font-size: 17px;
+}
+
+.dq-milestone p {
+  margin: 7px 0 0;
+
+  color: #9ca3af;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
    INVESTIGATION RESPONSIVE
    ============================================================ */
 
@@ -1460,6 +2471,21 @@ body {
       300px minmax(0, 1fr);
   }
 
+  .analytics-summary-grid {
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+  .dq-kpi-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .dq-dataset-grid {
+    grid-template-columns:
+      1fr;
+  }
+
 }
 
 
@@ -1476,6 +2502,39 @@ body {
 
   .review-case-list {
     max-height: 400px;
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-insight {
+    grid-column: span 1;
+  }
+
+  .dq-check-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dq-check-row:nth-child(odd) {
+    border-right: none;
+  }
+
+}
+
+
+/* ============================================================
+   DATA QUALITY RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 750px) {
+
+  .dq-header {
+    flex-direction: column;
+  }
+
+  .dq-quality-hero {
+    padding: 20px;
   }
 
 }
@@ -1565,8 +2624,21 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .dq-kpi-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .dq-milestone {
+    align-items: flex-start;
+  }
+
 }
 
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
 
 @media (max-width: 450px) {
 
@@ -1578,211 +2650,20 @@ body {
     grid-template-columns: 1fr;
   }
 
-}
-/* ============================================================
-   ANALYTICS PAGE
-============================================================ */
-
-.analytics-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.analytics-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.analytics-card span {
-  display: block;
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 10px;
-}
-
-.analytics-card strong {
-  display: block;
-  font-size: 27px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.analytics-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.analytics-section {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 22px;
-}
-
-.analytics-section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.analytics-section-header h2 {
-  margin: 0 0 5px 0;
-  font-size: 18px;
-  color: #111827;
-}
-
-.analytics-section-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.analytics-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.analytics-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 15px;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #f0f0f0;
-  color: #374151;
-  font-size: 14px;
-}
-
-.analytics-row strong {
-  font-size: 16px;
-  color: #111827;
-}
-
-.analytics-row-label {
-  display: flex;
-  align-items: center;
-}
-
-.analytics-risk-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-}
-
-.analytics-risk-badge.critical {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.analytics-risk-badge.high {
-  background: #ffedd5;
-  color: #9a3412;
-}
-
-.analytics-risk-badge.medium {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.analytics-risk-badge.low {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.analytics-empty {
-  padding: 30px;
-  text-align: center;
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.analytics-insight {
-  grid-column: span 2;
-}
-
-.analytics-insight-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-}
-
-.analytics-insight-list > div {
-  padding: 16px;
-  background: #f9fafb;
-  border-radius: 9px;
-  border: 1px solid #f0f0f0;
-}
-
-.analytics-insight-list strong {
-  display: block;
-  margin-bottom: 7px;
-  color: #111827;
-  font-size: 14px;
-}
-
-.analytics-insight-list p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-
-/* ============================================================
-   ANALYTICS RESPONSIVE
-============================================================ */
-
-@media (max-width: 1200px) {
-
   .analytics-summary-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-}
-
-
-@media (max-width: 900px) {
-
-  .analytics-grid {
     grid-template-columns: 1fr;
-  }
-
-  .analytics-insight {
-    grid-column: span 1;
-  }
-
-}
-
-
-@media (max-width: 650px) {
-
-  .analytics-summary-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .analytics-insight-list {
     grid-template-columns: 1fr;
   }
 
-}
-
-
-@media (max-width: 450px) {
-
-  .analytics-summary-grid {
+  .dq-kpi-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dq-score {
+    font-size: 34px;
   }
 
 }
