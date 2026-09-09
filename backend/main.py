@@ -12,6 +12,7 @@ from backend.routes import (
     cases,
     dashboard,
     data_quality,
+    ingestion,
     investigation,
     reconciliation,
     review,
@@ -129,7 +130,9 @@ app.include_router(
 app.include_router(
     audit.router
 )
-
+app.include_router(
+    ingestion.router
+)
 
 # ============================================================
 # ROOT

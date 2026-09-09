@@ -1070,8 +1070,189 @@ def import_reviews(
 # ============================================================
 # MAIN IMPORT PROCESS
 # ============================================================
+# ============================================================
+# PHASE 10 SOURCE DATA IMPORT
+# ============================================================
+
+def import_source_datasets():
+    """
+    Import only the core Phase 10 source datasets.
+
+    This imports:
+
+        invoices.csv
+        payments.csv
+        bank_transactions.csv
+
+    It intentionally does NOT import:
+
+        cases
+        investigations
+        risk assessments
+        reviews
+
+    This keeps the Phase 10 ingestion pipeline isolated
+    from the existing TANGLE case lifecycle.
+    """
+
+    print()
+    print("=" * 70)
+    print("TANGLE PHASE 10 SOURCE DATA IMPORT")
+    print("=" * 70)
+    print()
+
+    # --------------------------------------------------------
+    # Check required source files
+    # --------------------------------------------------------
+
+    required_files = [
+        INVOICES_FILE,
+        PAYMENTS_FILE,
+        BANK_TRANSACTIONS_FILE,
+    ]
+
+    missing_files = [
+        file
+        for file in required_files
+        if not file.exists()
+    ]
+
+    if missing_files:
+        print(
+            "[ERROR] The following required source files "
+            "are missing:"
+        )
+
+        for file in missing_files:
+            print(f"       {file}")
+
+        print()
+
+        raise FileNotFoundError(
+            "One or more Phase 10 source datasets are missing."
+        )
+
+    # --------------------------------------------------------
+    # Start database session
+    # --------------------------------------------------------
+
+    session = SessionLocal()
+
+    try:
+        # ----------------------------------------------------
+        # Import invoices
+        # ----------------------------------------------------
+
+        print("[PHASE 10] Importing invoices...")
+
+        invoice_result = import_invoices(
+            session
+        )
+
+        # ----------------------------------------------------
+        # Import payments
+        # ----------------------------------------------------
+
+        print("[PHASE 10] Importing payments...")
+
+        payment_result = import_payments(
+            session
+        )
+
+        # ----------------------------------------------------
+        # Import bank transactions
+        # ----------------------------------------------------
+
+        print(
+            "[PHASE 10] Importing bank transactions..."
+        )
+
+        bank_result = import_bank_transactions(
+            session
+        )
+
+        # ----------------------------------------------------
+        # Commit all source datasets together
+        # ----------------------------------------------------
+
+        session.commit()
+
+        print()
+        print("=" * 70)
+        print("PHASE 10 SOURCE IMPORT SUCCESSFUL")
+        print("=" * 70)
+        print()
+
+        print("SUMMARY")
+        print("-" * 70)
+
+        print(
+            f"Invoices:          "
+            f"{invoice_result['inserted']} inserted, "
+            f"{invoice_result['updated']} updated, "
+            f"{invoice_result['skipped']} skipped"
+        )
+
+        print(
+            f"Payments:          "
+            f"{payment_result['inserted']} inserted, "
+            f"{payment_result['updated']} updated, "
+            f"{payment_result['skipped']} skipped"
+        )
+
+        print(
+            f"Bank transactions: "
+            f"{bank_result['inserted']} inserted, "
+            f"{bank_result['updated']} updated, "
+            f"{bank_result['skipped']} skipped"
+        )
+
+        print()
+        print(
+            "Cases, investigations, risk assessments, "
+            "and reviews were NOT modified."
+        )
+
+        print()
+
+        return {
+            "status": "imported",
+            "datasets": {
+                "invoices": invoice_result,
+                "payments": payment_result,
+                "bank_transactions": bank_result,
+            },
+        }
+
+    except Exception:
+        # ----------------------------------------------------
+        # Roll back everything if any source import fails
+        # ----------------------------------------------------
+
+        session.rollback()
+
+        print()
+        print("=" * 70)
+        print("PHASE 10 SOURCE IMPORT FAILED")
+        print("=" * 70)
+        print()
+        print(
+            "All Phase 10 source-data changes were rolled back."
+        )
+        print()
+
+        raise
+
+    finally:
+        session.close()
+
+
+# ============================================================
+# MAIN IMPORT PROCESS
+# ============================================================
 
 def import_all_data():
+
 
     print()
     print("=" * 70)
@@ -1287,6 +1468,7 @@ def import_all_data():
 # ============================================================
 # ENTRY POINT
 # ============================================================
+
 
 if __name__ == "__main__":
     import_all_data()

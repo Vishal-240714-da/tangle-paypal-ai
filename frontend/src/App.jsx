@@ -13,6 +13,7 @@ import Analytics from "./pages/Analytics";
 import DataQuality from "./pages/DataQuality";
 import Reconciliation from "./pages/Reconciliation";
 import AuditTrail from "./pages/AuditTrail";
+import DataIngestion from "./pages/DataIngestion";
 
 import Layout from "./components/Layout";
 
@@ -49,6 +50,15 @@ function App() {
           <Route
             path="/data-quality"
             element={<DataQuality />}
+          />
+
+          {/* ==================================================
+              DATA INGESTION
+              ================================================== */}
+
+          <Route
+            path="/data-ingestion"
+            element={<DataIngestion />}
           />
 
           {/* ==================================================

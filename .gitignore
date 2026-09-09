@@ -60,3 +60,6 @@ frontend/.vite/
 
 # Local development files
 *.local
+
+# TANGLE staging data
+staging/

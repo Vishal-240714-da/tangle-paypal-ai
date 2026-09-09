@@ -5681,3 +5681,928 @@ body {
     padding: 16px;
   }
 }
+/* ============================================================
+   PHASE 10 — DATA INGESTION WORKSPACE
+   ============================================================ */
+
+.ingestion-page {
+  max-width: 1400px;
+}
+
+/* ------------------------------------------------------------
+   HEADER
+   ------------------------------------------------------------ */
+
+.ingestion-page .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.ingestion-page .page-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  color: #111827;
+}
+
+.ingestion-page .page-header p {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------
+   MESSAGES
+   ------------------------------------------------------------ */
+
+.ingestion-message {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ingestion-message.success {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.ingestion-message.error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* ------------------------------------------------------------
+   MAIN TWO-COLUMN AREA
+   ------------------------------------------------------------ */
+
+.ingestion-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* ------------------------------------------------------------
+   COMMON CARD
+   ------------------------------------------------------------ */
+
+.ingestion-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.ingestion-grid .ingestion-card {
+  margin-bottom: 0;
+  height: 100%;
+}
+
+.ingestion-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.ingestion-card-header h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ingestion-card-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------
+   DATASET STATUS
+   ------------------------------------------------------------ */
+
+.ingestion-dataset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ingestion-dataset-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 15px 16px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #111827;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ingestion-dataset-row:hover {
+  border-color: #bfdbfe;
+  background: #f8fbff;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.06);
+}
+
+.ingestion-dataset-row.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.ingestion-dataset-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ingestion-dataset-main strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.ingestion-dataset-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ingestion-status-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 62px;
+  padding: 5px 8px;
+
+  border-radius: 6px;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.status-badge.staged {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* ------------------------------------------------------------
+   UPLOAD FORM
+   ------------------------------------------------------------ */
+
+.ingestion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ingestion-form label {
+  margin-top: 4px;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ingestion-form select,
+.ingestion-form input[type="file"] {
+  width: 100%;
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ingestion-form select:focus,
+.ingestion-form input[type="file"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.ingestion-form input[type="file"] {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.selected-file {
+  margin-top: 4px;
+  padding: 11px 13px;
+
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+
+  background: #eff6ff;
+  color: #374151;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.selected-file strong {
+  color: #1d4ed8;
+}
+
+/* ------------------------------------------------------------
+   BUTTONS
+   ------------------------------------------------------------ */
+
+.ingestion-page .primary-button,
+.ingestion-page .secondary-button {
+  min-height: 42px;
+  padding: 10px 16px;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.ingestion-page .primary-button {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.ingestion-page .primary-button:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.ingestion-page .secondary-button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+}
+
+.ingestion-page .secondary-button:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.ingestion-page .primary-button:active:not(:disabled),
+.ingestion-page .secondary-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.ingestion-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ------------------------------------------------------------
+   PIPELINE
+   ------------------------------------------------------------ */
+
+.ingestion-pipeline-card {
+  padding: 26px;
+}
+
+.ingestion-pipeline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px 0;
+}
+
+.pipeline-step {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 15px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: #f9fafb;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.pipeline-step.complete {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.pipeline-number {
+  flex-shrink: 0;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e5e7eb;
+  color: #6b7280;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pipeline-step.complete .pipeline-number {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.pipeline-step strong {
+  display: block;
+
+  color: #111827;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.pipeline-step > div > span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #6b7280;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.pipeline-arrow {
+  flex-shrink: 0;
+
+  color: #9ca3af;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------
+   VALIDATION
+   ------------------------------------------------------------ */
+
+.ingestion-validation {
+  margin-top: 6px;
+}
+
+.validation-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.validation-metric {
+  min-width: 0;
+
+  padding: 15px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+
+  background: #f9fafb;
+}
+
+.validation-metric span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.validation-metric strong {
+  display: block;
+
+  color: #111827;
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.validation-metric .metric-success {
+  color: #15803d;
+}
+
+.validation-metric .metric-error {
+  color: #dc2626;
+}
+
+/* ------------------------------------------------------------
+   ACTIVATION DECISION
+   ------------------------------------------------------------ */
+
+.validation-decision {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  margin-top: 16px;
+  padding: 16px 18px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+.validation-decision span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.validation-decision strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.decision-allowed {
+  color: #15803d;
+}
+
+.decision-blocked {
+  color: #dc2626;
+}
+
+/* ------------------------------------------------------------
+   EMPTY STATE
+   ------------------------------------------------------------ */
+
+.ingestion-empty {
+  padding: 26px;
+
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+
+  background: #f9fafb;
+
+  color: #6b7280;
+
+  text-align: center;
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------------
+   VALIDATION ISSUES
+   ------------------------------------------------------------ */
+
+.validation-issues {
+  margin-top: 20px;
+}
+
+.validation-issues h3 {
+  margin: 0 0 10px;
+
+  color: #111827;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.validation-issue {
+  margin-top: 8px;
+  padding: 12px 14px;
+
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+
+  background: #fffbeb;
+}
+
+.validation-issue.error {
+  border-color: #fecaca;
+  border-left-color: #dc2626;
+  background: #fef2f2;
+}
+
+.validation-issue > div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.validation-issue strong {
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.validation-issue.error strong {
+  color: #b91c1c;
+}
+
+.validation-issue span {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.validation-issue p {
+  margin: 5px 0 0;
+
+  color: #57534e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------
+   IMPORT
+   ------------------------------------------------------------ */
+
+.ingestion-import-note {
+  padding: 14px 16px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+
+  background: #f8fafc;
+
+  color: #64748b;
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+
+@media (max-width: 1100px) {
+  .ingestion-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .validation-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ingestion-pipeline {
+    flex-wrap: wrap;
+  }
+
+  .pipeline-step {
+    min-width: calc(50% - 25px);
+  }
+}
+
+@media (max-width: 750px) {
+  .ingestion-page .page-header {
+    flex-direction: column;
+  }
+
+  .ingestion-card {
+    padding: 20px;
+  }
+
+  .ingestion-card-header {
+    flex-direction: column;
+  }
+
+  .validation-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pipeline-step {
+    min-width: 100%;
+  }
+
+  .pipeline-arrow {
+    display: none;
+  }
+
+  .validation-decision {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ingestion-status-badges {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 500px) {
+  .validation-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .ingestion-dataset-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+/* =========================================================
+   PHASE 10 — IMPORT SUMMARY
+   ========================================================= */
+
+.ingestion-import-summary {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid #dbe4ea;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.ingestion-import-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.ingestion-import-summary-header h3 {
+  margin: 0 0 5px;
+  font-size: 17px;
+  color: #111827;
+}
+
+.ingestion-import-summary-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.import-success-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.ingestion-import-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.import-stat {
+  padding: 17px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 11px;
+}
+
+.import-stat span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.import-stat strong {
+  display: inline-block;
+  font-size: 26px;
+  line-height: 1;
+  color: #111827;
+}
+
+.import-stat small {
+  margin-left: 7px;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.ingestion-import-detail {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ingestion-import-detail div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ingestion-import-detail span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ingestion-import-detail strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+@media (max-width: 750px) {
+  .ingestion-import-summary-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ingestion-import-stats,
+  .ingestion-import-detail {
+    grid-template-columns: 1fr;
+  }
+}
+/* =========================================================
+   PHASE 10 — POSTGRESQL IMPORT SUMMARY
+   ========================================================= */
+
+.ingestion-import-summary {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid #dbe4ea;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.ingestion-import-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.ingestion-import-summary-header h3 {
+  margin: 0 0 5px;
+  font-size: 17px;
+  color: #111827;
+}
+
+.ingestion-import-summary-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.import-success-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.ingestion-import-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.import-stat {
+  padding: 17px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 11px;
+}
+
+.import-stat span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.import-stat strong {
+  display: inline-block;
+  font-size: 26px;
+  line-height: 1;
+  color: #111827;
+}
+
+.import-stat small {
+  margin-left: 7px;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.ingestion-import-detail {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ingestion-import-detail div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ingestion-import-detail span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ingestion-import-detail strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+@media (max-width: 750px) {
+  .ingestion-import-summary-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ingestion-import-stats,
+  .ingestion-import-detail {
+    grid-template-columns: 1fr;
+  }
+}

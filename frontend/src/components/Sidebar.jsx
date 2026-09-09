@@ -1,4 +1,3 @@
-
 import { NavLink } from "react-router-dom";
 
 function Sidebar() {
@@ -71,6 +70,21 @@ function Sidebar() {
         >
           <span>✓</span>
           Data Quality
+        </NavLink>
+
+
+        {/* DATA INGESTION */}
+
+        <NavLink
+          to="/data-ingestion"
+          className={({ isActive }) =>
+            isActive
+              ? "nav-item active"
+              : "nav-item"
+          }
+        >
+          <span>⇩</span>
+          Data Ingestion
         </NavLink>
 
 

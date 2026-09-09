@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -11,7 +12,10 @@ import pandas as pd
 # CONFIGURATION
 # ============================================================
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+DATA_DIR = BASE_DIR / "data"
+STAGING_DIR = BASE_DIR / "staging"
 
 SUPPORTED_CURRENCIES = {
     "INR",
@@ -41,7 +45,9 @@ class QualityResult:
     valid_records: int
     warnings: int
     errors: int
-    issues: list[QualityIssue] = field(default_factory=list)
+    issues: list[QualityIssue] = field(
+        default_factory=list
+    )
 
 
 # ============================================================
@@ -52,13 +58,24 @@ def _is_missing(value: Any) -> bool:
     """
     Return True when a value is empty or NaN.
     """
-    return pd.isna(value) or str(value).strip() == ""
+
+    if value is None:
+        return True
+
+    try:
+        if pd.isna(value):
+            return True
+    except Exception:
+        pass
+
+    return str(value).strip() == ""
 
 
 def _record_id(value: Any) -> str | None:
     """
     Convert an ID value into a clean string.
     """
+
     if _is_missing(value):
         return None
 
@@ -89,6 +106,7 @@ def _validate_dataframe_structure(
     ]
 
     if missing_columns:
+
         issues.append(
             QualityIssue(
                 dataset=dataset,
@@ -130,7 +148,9 @@ def _validate_dataframe_structure(
         # ----------------------------------------------------
 
         duplicate_mask = (
-            df[id_column].duplicated(keep=False)
+            df[id_column].duplicated(
+                keep=False
+            )
             & df[id_column].notna()
         )
 
@@ -146,7 +166,8 @@ def _validate_dataframe_structure(
                     issue_type="DUPLICATE_RECORD",
                     severity="ERROR",
                     message=(
-                        f"Duplicate {id_column}: {value}."
+                        f"Duplicate {id_column}: "
+                        f"{value}."
                     ),
                 )
             )
@@ -175,7 +196,9 @@ def _validate_amounts(
         for index, value in df[column].items():
 
             record_id = (
-                _record_id(df.at[index, id_column])
+                _record_id(
+                    df.at[index, id_column]
+                )
                 if id_column in df.columns
                 else None
             )
@@ -193,7 +216,8 @@ def _validate_amounts(
                         issue_type="INVALID_AMOUNT",
                         severity="ERROR",
                         message=(
-                            f"Missing amount in {column}."
+                            f"Missing amount in "
+                            f"{column}."
                         ),
                     )
                 )
@@ -216,8 +240,8 @@ def _validate_amounts(
                         issue_type="INVALID_AMOUNT",
                         severity="ERROR",
                         message=(
-                            f"Invalid numeric amount in "
-                            f"{column}: {value}."
+                            f"Invalid numeric amount "
+                            f"in {column}: {value}."
                         ),
                     )
                 )
@@ -237,7 +261,8 @@ def _validate_amounts(
                         issue_type="NEGATIVE_VALUE",
                         severity="ERROR",
                         message=(
-                            f"Negative value in {column}: "
+                            f"Negative value in "
+                            f"{column}: "
                             f"{numeric_value}."
                         ),
                     )
@@ -267,7 +292,9 @@ def _validate_dates(
         for index, value in df[column].items():
 
             record_id = (
-                _record_id(df.at[index, id_column])
+                _record_id(
+                    df.at[index, id_column]
+                )
                 if id_column in df.columns
                 else None
             )
@@ -285,7 +312,8 @@ def _validate_dates(
                         issue_type="INVALID_DATE",
                         severity="ERROR",
                         message=(
-                            f"Missing date in {column}."
+                            f"Missing date in "
+                            f"{column}."
                         ),
                     )
                 )
@@ -310,7 +338,8 @@ def _validate_dates(
                         issue_type="INVALID_DATE",
                         severity="ERROR",
                         message=(
-                            f"Invalid date in {column}: "
+                            f"Invalid date in "
+                            f"{column}: "
                             f"{value}."
                         ),
                     )
@@ -337,7 +366,9 @@ def _validate_currencies(
     for index, value in df["currency"].items():
 
         record_id = (
-            _record_id(df.at[index, id_column])
+            _record_id(
+                df.at[index, id_column]
+            )
             if id_column in df.columns
             else None
         )
@@ -360,7 +391,9 @@ def _validate_currencies(
 
             continue
 
-        currency = str(value).strip().upper()
+        currency = str(
+            value
+        ).strip().upper()
 
         # ----------------------------------------------------
         # Unsupported currency
@@ -448,7 +481,8 @@ def _validate_relationships(
                     issue_type="MISSING_RELATIONSHIP",
                     severity="WARNING",
                     message=(
-                        "Payment has no invoice reference."
+                        "Payment has no "
+                        "invoice reference."
                     ),
                 )
             )
@@ -456,10 +490,7 @@ def _validate_relationships(
             continue
 
         # ----------------------------------------------------
-        # TANGLE supports multi-invoice payments.
-        #
-        # Example:
-        # INV-0001|INV-0002|INV-0003
+        # Multi-invoice payments
         # ----------------------------------------------------
 
         references = [
@@ -485,7 +516,9 @@ def _validate_relationships(
                     message=(
                         "Payment references missing "
                         "invoice(s): "
-                        + ", ".join(missing_references)
+                        + ", ".join(
+                            missing_references
+                        )
                     ),
                 )
             )
@@ -675,25 +708,110 @@ def _validate_dataset(
 
 
 # ============================================================
-# MAIN DATA QUALITY ENGINE
+# LOAD DATASETS
 # ============================================================
 
-def run_data_quality_check() -> dict[str, Any]:
+def _load_datasets(
+    data_dir: Path,
+) -> tuple[
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+]:
+    """
+    Load the three core TANGLE datasets from a directory.
+    """
 
-    # --------------------------------------------------------
-    # Load source datasets
-    # --------------------------------------------------------
+    data_dir = Path(data_dir)
+
+    invoices_file = (
+        data_dir / "invoices.csv"
+    )
+
+    payments_file = (
+        data_dir / "payments.csv"
+    )
+
+    bank_transactions_file = (
+        data_dir / "bank_transactions.csv"
+    )
+
+    missing_files = [
+        path
+        for path in [
+            invoices_file,
+            payments_file,
+            bank_transactions_file,
+        ]
+        if not path.exists()
+    ]
+
+    if missing_files:
+
+        missing_names = ", ".join(
+            path.name
+            for path in missing_files
+        )
+
+        raise FileNotFoundError(
+            "Required dataset file(s) missing: "
+            + missing_names
+        )
 
     invoices = pd.read_csv(
-        DATA_DIR / "invoices.csv"
+        invoices_file
     )
 
     payments = pd.read_csv(
-        DATA_DIR / "payments.csv"
+        payments_file
     )
 
     bank_transactions = pd.read_csv(
-        DATA_DIR / "bank_transactions.csv"
+        bank_transactions_file
+    )
+
+    return (
+        invoices,
+        payments,
+        bank_transactions,
+    )
+
+
+# ============================================================
+# MAIN DATA QUALITY ENGINE
+# ============================================================
+
+def run_data_quality_check(
+    data_dir: Path | None = None,
+) -> dict[str, Any]:
+    """
+    Run the TANGLE Data Quality Engine.
+
+    Default:
+        validates active data/
+
+    Optional:
+        validates another directory.
+
+    This allows the exact same quality engine to be used
+    for staged datasets without modifying active data.
+    """
+
+    if data_dir is None:
+        data_dir = DATA_DIR
+
+    data_dir = Path(data_dir)
+
+    # --------------------------------------------------------
+    # Load datasets
+    # --------------------------------------------------------
+
+    (
+        invoices,
+        payments,
+        bank_transactions,
+    ) = _load_datasets(
+        data_dir
     )
 
     # ========================================================
@@ -821,7 +939,8 @@ def run_data_quality_check() -> dict[str, Any]:
     }
 
     valid_records = max(
-        total_records - len(affected_records),
+        total_records
+        - len(affected_records),
         0,
     )
 
@@ -857,7 +976,10 @@ def run_data_quality_check() -> dict[str, Any]:
     # ISSUE TYPE SUMMARY
     # ========================================================
 
-    issue_type_counts: dict[str, int] = {}
+    issue_type_counts: dict[
+        str,
+        int,
+    ] = {}
 
     for issue in all_issues:
 
@@ -877,19 +999,19 @@ def run_data_quality_check() -> dict[str, Any]:
 
     return {
         "quality_score": quality_score,
-
         "total_records": total_records,
-
         "valid_records": valid_records,
-
         "warnings": warnings,
-
         "errors": errors,
 
         "datasets": {
             result.dataset: {
-                "total_records": result.total_records,
-                "valid_records": result.valid_records,
+                "total_records": (
+                    result.total_records
+                ),
+                "valid_records": (
+                    result.valid_records
+                ),
                 "warnings": result.warnings,
                 "errors": result.errors,
             }
@@ -909,6 +1031,159 @@ def run_data_quality_check() -> dict[str, Any]:
             for issue in all_issues
         ],
     }
+
+
+# ============================================================
+# STAGED DATASET VALIDATION HELPER
+# ============================================================
+
+def run_staged_data_quality_check(
+    dataset_name: str,
+) -> dict[str, Any]:
+    """
+    Validate a staged dataset safely.
+
+    The staged dataset replaces only that dataset inside
+    a temporary validation directory.
+
+    The other two datasets come from the active data
+    directory.
+
+    The active data directory is never modified.
+    """
+
+    import shutil
+    import tempfile
+
+    dataset_name = (
+        dataset_name
+        .strip()
+        .lower()
+    )
+
+    supported_datasets = {
+        "invoices": "invoices.csv",
+        "payments": "payments.csv",
+        "bank_transactions": (
+            "bank_transactions.csv"
+        ),
+    }
+
+    if dataset_name not in supported_datasets:
+
+        raise ValueError(
+            f"Unsupported dataset: "
+            f"{dataset_name}. Supported datasets are: "
+            f"{', '.join(supported_datasets.keys())}."
+        )
+
+    staged_file = (
+        STAGING_DIR
+        / supported_datasets[dataset_name]
+    )
+
+    if not staged_file.exists():
+
+        raise FileNotFoundError(
+            f"Staged dataset not found: "
+            f"{staged_file}"
+        )
+
+    temporary_directory = Path(
+        tempfile.mkdtemp(
+            prefix="tangle_quality_"
+        )
+    )
+
+    try:
+
+        # ----------------------------------------------------
+        # Copy active datasets into temporary directory.
+        # ----------------------------------------------------
+
+        for filename in supported_datasets.values():
+
+            active_file = (
+                DATA_DIR / filename
+            )
+
+            if not active_file.exists():
+
+                raise FileNotFoundError(
+                    f"Active dataset not found: "
+                    f"{active_file}"
+                )
+
+            shutil.copy2(
+                active_file,
+                temporary_directory / filename,
+            )
+
+        # ----------------------------------------------------
+        # Replace the selected dataset with its staged version.
+        # ----------------------------------------------------
+
+        shutil.copy2(
+            staged_file,
+            temporary_directory
+            / supported_datasets[dataset_name],
+        )
+
+        # ----------------------------------------------------
+        # Run the complete existing quality engine.
+        # ----------------------------------------------------
+
+        quality_result = (
+            run_data_quality_check(
+                data_dir=temporary_directory
+            )
+        )
+
+        # ----------------------------------------------------
+        # Add ingestion-specific metadata.
+        # ----------------------------------------------------
+
+        quality_result["dataset"] = (
+            dataset_name
+        )
+
+        quality_result["filename"] = (
+            staged_file.name
+        )
+
+        quality_result["storage"] = (
+            "staging"
+        )
+
+        quality_result["validation_type"] = (
+            "full_data_quality"
+        )
+
+        # ----------------------------------------------------
+        # Activation rule
+        #
+        # Warnings are allowed.
+        # Errors block activation.
+        # ----------------------------------------------------
+
+        quality_result[
+            "activation_allowed"
+        ] = (
+            quality_result["errors"] == 0
+        )
+
+        return quality_result
+
+    finally:
+
+        # ----------------------------------------------------
+        # Always delete temporary validation directory.
+        # ----------------------------------------------------
+
+        shutil.rmtree(
+            temporary_directory,
+            ignore_errors=True,
+        )
 
 
 # ============================================================
