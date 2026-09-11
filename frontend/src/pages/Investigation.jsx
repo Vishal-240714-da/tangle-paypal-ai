@@ -122,7 +122,6 @@ function Investigation() {
       <div className="page">
         <div className="page-header">
           <h1>Case Investigation</h1>
-
           <p>
             Loading investigation for {caseId}...
           </p>
@@ -202,6 +201,19 @@ function Investigation() {
         caseData.human_review_required
     );
 
+  const exceptionCategory =
+    caseData.category ||
+    caseData.exception_type ||
+    "UNKNOWN";
+
+  const riskLevel =
+    risk.risk_level || "N/A";
+
+  const currentStatus =
+    review.case_status ||
+    caseData.status ||
+    "—";
+
   // ============================================================
   // MAIN PAGE
   // ============================================================
@@ -211,91 +223,139 @@ function Investigation() {
       <div className="investigation-page">
 
         {/* ====================================================
-            HEADER
+            INVESTIGATION COMMAND HEADER
         ==================================================== */}
 
-        <div className="investigation-header">
+        <div className="investigation-command-header">
 
-          <div>
+          <div className="investigation-command-top">
 
             <button
-              className="investigation-back-button"
+              className="investigation-back-button investigation-command-back"
               onClick={() => navigate("/cases")}
             >
               ← Back to Cases
             </button>
 
-            <h1>
-              Case Investigation
-            </h1>
-
-            <p>
-              Explainable AI investigation and
-              financial evidence for {caseId}
-            </p>
-
-          </div>
-
-          <div className="investigation-case-id">
-            <span>CASE ID</span>
-
-            <strong>
-              {caseId}
-            </strong>
-          </div>
-
-        </div>
-
-
-        {/* ====================================================
-            SUMMARY
-        ==================================================== */}
-
-        <div className="investigation-summary-grid">
-
-          <div className="investigation-info-card">
-            <span className="investigation-card-label">
-              Risk Level
+            <span className="investigation-command-label">
+              INVESTIGATION WORKSPACE
             </span>
 
-            <strong className="investigation-card-value">
-              {risk.risk_level || "N/A"}
-            </strong>
           </div>
 
 
-          <div className="investigation-info-card">
-            <span className="investigation-card-label">
-              Priority Score
-            </span>
+          <div className="investigation-command-main">
 
-            <strong className="investigation-card-value">
-              {risk.priority_score ?? "N/A"}
-            </strong>
+            <div className="investigation-command-title">
+
+              <div className="investigation-case-kicker">
+                CASE
+              </div>
+
+              <h1>
+                {caseId}
+              </h1>
+
+              <p>
+                Explainable AI investigation and
+                financial evidence
+              </p>
+
+            </div>
+
+
+            <div className="investigation-command-status">
+
+              <span className="investigation-status-label">
+                CURRENT STATUS
+              </span>
+
+              <strong>
+                {currentStatus}
+              </strong>
+
+            </div>
+
           </div>
 
 
-          <div className="investigation-info-card">
-            <span className="investigation-card-label">
-              AI Confidence
-            </span>
-
-            <strong className="investigation-card-value">
-              {formatConfidence(confidence)}
-            </strong>
-          </div>
+          <div className="investigation-command-divider" />
 
 
-          <div className="investigation-info-card">
-            <span className="investigation-card-label">
-              Human Review
-            </span>
+          <div className="investigation-command-metrics">
 
-            <strong className="investigation-card-value">
-              {humanReviewRequired
-                ? "Required"
-                : "Not Required"}
-            </strong>
+            <div className="investigation-command-metric">
+
+              <span>
+                Exception
+              </span>
+
+              <strong className="investigation-command-exception">
+                {exceptionCategory}
+              </strong>
+
+            </div>
+
+
+            <div className="investigation-command-metric">
+
+              <span>
+                Risk Level
+              </span>
+
+              <strong className="investigation-risk-value">
+                {riskLevel}
+              </strong>
+
+            </div>
+
+
+            <div className="investigation-command-metric">
+
+              <span>
+                Priority Score
+              </span>
+
+              <strong>
+                {risk.priority_score ?? "N/A"}
+              </strong>
+
+            </div>
+
+
+            <div className="investigation-command-metric">
+
+              <span>
+                AI Confidence
+              </span>
+
+              <strong>
+                {formatConfidence(confidence)}
+              </strong>
+
+            </div>
+
+
+            <div className="investigation-command-metric">
+
+              <span>
+                Human Review
+              </span>
+
+              <strong
+                className={
+                  humanReviewRequired
+                    ? "investigation-review-required"
+                    : "investigation-review-not-required"
+                }
+              >
+                {humanReviewRequired
+                  ? "Required"
+                  : "Not Required"}
+              </strong>
+
+            </div>
+
           </div>
 
         </div>
@@ -307,14 +367,31 @@ function Investigation() {
 
         <div className="investigation-section">
 
-          <h2>
-            Transaction Information
-          </h2>
+          <div className="investigation-section-heading">
+
+            <div>
+              <span className="investigation-section-eyebrow">
+                TRANSACTION
+              </span>
+
+              <h2>
+                Transaction Information
+              </h2>
+
+              <p>
+                Core identifiers and exception classification
+                associated with this case.
+              </p>
+            </div>
+
+          </div>
+
 
           <div className="investigation-detail-grid">
 
             <div>
               <span>Record Type</span>
+
               <strong>
                 {caseData.record_type || "—"}
               </strong>
@@ -323,6 +400,7 @@ function Investigation() {
 
             <div>
               <span>Record ID</span>
+
               <strong>
                 {caseData.record_id || "—"}
               </strong>
@@ -331,6 +409,7 @@ function Investigation() {
 
             <div>
               <span>Invoice ID</span>
+
               <strong>
                 {caseData.invoice_id || "—"}
               </strong>
@@ -339,6 +418,7 @@ function Investigation() {
 
             <div>
               <span>Payment ID</span>
+
               <strong>
                 {caseData.payment_id || "—"}
               </strong>
@@ -347,16 +427,16 @@ function Investigation() {
 
             <div>
               <span>Exception Category</span>
+
               <strong>
-                {caseData.category ||
-                  caseData.exception_type ||
-                  "—"}
+                {exceptionCategory}
               </strong>
             </div>
 
 
             <div>
               <span>Case Status</span>
+
               <strong>
                 {caseData.status || "—"}
               </strong>
@@ -371,11 +451,27 @@ function Investigation() {
             FINANCIAL ANALYSIS
         ==================================================== */}
 
-        <div className="investigation-section">
+        <div className="investigation-section investigation-financial-section">
 
-          <h2>
-            Financial Analysis
-          </h2>
+          <div className="investigation-section-heading">
+
+            <div>
+              <span className="investigation-section-eyebrow">
+                FINANCIAL EVIDENCE
+              </span>
+
+              <h2>
+                Financial Analysis
+              </h2>
+
+              <p>
+                Quantitative comparison of invoice, payment,
+                bank and outstanding amounts.
+              </p>
+            </div>
+
+          </div>
+
 
           <div className="investigation-detail-grid">
 
@@ -478,8 +574,7 @@ function Investigation() {
               <span>Financial Status</span>
 
               <strong>
-                {financial.financial_status ||
-                  "—"}
+                {financial.financial_status || "—"}
               </strong>
             </div>
 
@@ -488,8 +583,7 @@ function Investigation() {
               <span>Financial Impact</span>
 
               <strong>
-                {financial.financial_impact ||
-                  "—"}
+                {financial.financial_impact || "—"}
               </strong>
             </div>
 
@@ -502,35 +596,173 @@ function Investigation() {
             EXPLAINABLE AI INVESTIGATION
         ==================================================== */}
 
-        <div className="investigation-section explainable-investigation">
+        <div className="investigation-section explainable-investigation investigation-ai-section">
 
-          <div className="investigation-section-heading">
+          <div className="investigation-ai-header">
 
             <div>
+
+              <span className="investigation-ai-eyebrow">
+                EXPLAINABLE AI
+              </span>
+
               <h2>
                 AI Investigation
               </h2>
 
               <p>
-                Every AI conclusion is supported
-                by transaction evidence.
+                Trace how TANGLE moved from transaction
+                evidence to its investigation conclusion.
               </p>
+
             </div>
 
+
             <div className="ai-confidence-badge">
+
               <span>
-                Confidence
+                AI Confidence
               </span>
 
               <strong>
                 {formatConfidence(confidence)}
               </strong>
+
             </div>
 
           </div>
 
 
-          {/* FINDING */}
+          {/* ====================================================
+              EXPLAINABILITY SNAPSHOT
+          ==================================================== */}
+
+          <div className="investigation-ai-snapshot">
+
+            <div className="investigation-ai-snapshot-item">
+
+              <span>
+                Exception
+              </span>
+
+              <strong>
+                {exceptionCategory}
+              </strong>
+
+            </div>
+
+
+            <div className="investigation-ai-snapshot-item">
+
+              <span>
+                AI Decision
+              </span>
+
+              <strong>
+                {caseData.decision ||
+                  caseData.suggested_action ||
+                  "—"}
+              </strong>
+
+            </div>
+
+
+            <div className="investigation-ai-snapshot-item">
+
+              <span>
+                Risk Level
+              </span>
+
+              <strong>
+                {riskLevel}
+              </strong>
+
+            </div>
+
+
+            <div className="investigation-ai-snapshot-item">
+
+              <span>
+                Priority
+              </span>
+
+              <strong>
+                {risk.priority_score ?? "—"}
+              </strong>
+
+            </div>
+
+          </div>
+
+                    {/* ====================================================
+              AI CONCLUSION
+          ==================================================== */}
+
+          <div className="investigation-ai-conclusion">
+
+            <div className="investigation-ai-conclusion-main">
+
+              <span className="investigation-ai-conclusion-eyebrow">
+                AI CONCLUSION
+              </span>
+
+              <h3>
+                {exceptionCategory}
+              </h3>
+
+              <p className="investigation-ai-conclusion-finding">
+                {investigation.finding ||
+                  "No investigation finding is available."}
+              </p>
+
+            </div>
+
+
+            <div className="investigation-ai-conclusion-details">
+
+              <div>
+                <span>
+                  Likely Cause
+                </span>
+
+                <p>
+                  {investigation.likely_cause ||
+                    "No likely cause has been identified."}
+                </p>
+              </div>
+
+
+              <div>
+                <span>
+                  Recommended Action
+                </span>
+
+                <p>
+                  {investigation.recommendation ||
+                    "No recommendation is available."}
+                </p>
+              </div>
+
+            </div>
+
+
+            <div className="investigation-ai-conclusion-confidence">
+
+              <span>
+                CONFIDENCE
+              </span>
+
+              <strong>
+                {formatConfidence(confidence)}
+              </strong>
+
+            </div>
+
+          </div>
+
+          {/* ====================================================
+              1 — FINDING
+          ==================================================== */}
 
           <div className="investigation-explain-block">
 
@@ -541,20 +773,39 @@ function Investigation() {
             <div className="investigation-step-content">
 
               <span>
-                Finding
+                What TANGLE Found
               </span>
 
-              <p>
+              <p className="investigation-primary-finding">
                 {investigation.finding ||
-                  "No finding available."}
+                  "No investigation finding is available."}
               </p>
+
+
+              {investigation.rationale && (
+
+                <div className="investigation-rationale">
+
+                  <strong>
+                    Detection rationale
+                  </strong>
+
+                  <p>
+                    {investigation.rationale}
+                  </p>
+
+                </div>
+
+              )}
 
             </div>
 
           </div>
 
 
-          {/* LIKELY CAUSE */}
+          {/* ====================================================
+              2 — REASONING
+          ==================================================== */}
 
           <div className="investigation-explain-block">
 
@@ -565,20 +816,55 @@ function Investigation() {
             <div className="investigation-step-content">
 
               <span>
-                Likely Cause
+                Why TANGLE Thinks This
               </span>
 
-              <p>
-                {investigation.likely_cause ||
-                  "No likely cause identified."}
+              <p className="investigation-step-description">
+                The following reasoning path explains how
+                the transaction evidence led to this conclusion.
               </p>
+
+
+              {reasoning.length > 0 ? (
+
+                <ol className="investigation-reasoning-timeline">
+
+                  {reasoning.map(
+                    (step, index) => (
+
+                      <li key={index}>
+
+                        <div className="investigation-reasoning-index">
+                          {index + 1}
+                        </div>
+
+                        <div className="investigation-reasoning-text">
+                          {step}
+                        </div>
+
+                      </li>
+
+                    )
+                  )}
+
+                </ol>
+
+              ) : (
+
+                <div className="investigation-no-evidence">
+                  No structured reasoning is available.
+                </div>
+
+              )}
 
             </div>
 
           </div>
 
 
-          {/* EVIDENCE */}
+          {/* ====================================================
+              3 — EVIDENCE
+          ==================================================== */}
 
           <div className="investigation-evidence-container">
 
@@ -589,12 +875,12 @@ function Investigation() {
             <div className="investigation-step-content">
 
               <span>
-                Evidence
+                Evidence Used
               </span>
 
               <p className="investigation-evidence-intro">
-                The investigation is based on
-                the following financial facts:
+                These financial facts were used by TANGLE
+                during the investigation.
               </p>
 
 
@@ -610,6 +896,10 @@ function Investigation() {
                         key={`${item.label}-${index}`}
                       >
 
+                        <div className="investigation-evidence-source">
+                          {item.source || "Evidence"}
+                        </div>
+
                         <span>
                           {item.label}
                         </span>
@@ -617,12 +907,6 @@ function Investigation() {
                         <strong>
                           {item.value}
                         </strong>
-
-                        {item.source && (
-                          <small>
-                            Source: {item.source}
-                          </small>
-                        )}
 
                       </div>
 
@@ -634,7 +918,24 @@ function Investigation() {
               ) : (
 
                 <div className="investigation-no-evidence">
-                  No structured evidence available.
+                  No structured evidence is available.
+                </div>
+
+              )}
+
+
+              {investigation.evidence_summary && (
+
+                <div className="investigation-evidence-summary">
+
+                  <strong>
+                    Evidence Summary
+                  </strong>
+
+                  <p>
+                    {investigation.evidence_summary}
+                  </p>
+
                 </div>
 
               )}
@@ -644,7 +945,9 @@ function Investigation() {
           </div>
 
 
-          {/* CONFIDENCE */}
+          {/* ====================================================
+              4 — LIKELY CAUSE
+          ==================================================== */}
 
           <div className="investigation-explain-block">
 
@@ -655,7 +958,33 @@ function Investigation() {
             <div className="investigation-step-content">
 
               <span>
-                Confidence
+                Likely Cause
+              </span>
+
+              <p>
+                {investigation.likely_cause ||
+                  "No likely cause has been identified."}
+              </p>
+
+            </div>
+
+          </div>
+
+
+          {/* ====================================================
+              5 — CONFIDENCE
+          ==================================================== */}
+
+          <div className="investigation-explain-block">
+
+            <div className="investigation-step-number">
+              5
+            </div>
+
+            <div className="investigation-step-content">
+
+              <span>
+                Confidence Assessment
               </span>
 
               <div className="investigation-confidence-row">
@@ -671,8 +1000,7 @@ function Investigation() {
                     style={{
                       width: `${Math.min(
                         Math.max(
-                          Number(confidence || 0) *
-                            100,
+                          Number(confidence || 0) * 100,
                           0
                         ),
                         100
@@ -684,28 +1012,12 @@ function Investigation() {
 
               </div>
 
-            </div>
 
-          </div>
-
-
-          {/* RECOMMENDATION */}
-
-          <div className="investigation-explain-block">
-
-            <div className="investigation-step-number">
-              5
-            </div>
-
-            <div className="investigation-step-content">
-
-              <span>
-                Recommendation
-              </span>
-
-              <p className="investigation-recommendation">
-                {investigation.recommendation ||
-                  "No recommendation available."}
+              <p className="investigation-confidence-description">
+                Confidence represents TANGLE's certainty in
+                the detected exception and investigation
+                conclusion. It does not replace human review
+                when governance rules require approval.
               </p>
 
             </div>
@@ -713,33 +1025,62 @@ function Investigation() {
           </div>
 
 
-          {/* REASONING */}
+          {/* ====================================================
+              6 — RECOMMENDATION
+          ==================================================== */}
 
-          {reasoning.length > 0 && (
+          <div className="investigation-explain-block investigation-final-step">
 
-            <div className="investigation-reasoning-container">
+            <div className="investigation-step-number">
+              6
+            </div>
+
+            <div className="investigation-step-content">
 
               <span>
-                Investigation Reasoning
+                Recommended Action
               </span>
 
-              <ol>
+              <p className="investigation-recommendation">
+                {investigation.recommendation ||
+                  "No recommendation is available."}
+              </p>
 
-                {reasoning.map(
-                  (step, index) => (
 
-                    <li key={index}>
-                      {step}
-                    </li>
+              <div className="investigation-governance-note">
 
-                  )
-                )}
+                <div>
 
-              </ol>
+                  <span>
+                    Human Review
+                  </span>
+
+                  <strong>
+                    {humanReviewRequired
+                      ? "Required"
+                      : "Not Required"}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Current Case Status
+                  </span>
+
+                  <strong>
+                    {currentStatus}
+                  </strong>
+
+                </div>
+
+              </div>
 
             </div>
 
-          )}
+          </div>
 
         </div>
 
@@ -750,9 +1091,27 @@ function Investigation() {
 
         <div className="investigation-section">
 
-          <h2>
-            Risk Assessment
-          </h2>
+          <div className="investigation-section-heading">
+
+            <div>
+
+              <span className="investigation-section-eyebrow">
+                RISK & GOVERNANCE
+              </span>
+
+              <h2>
+                Risk Assessment
+              </h2>
+
+              <p>
+                TANGLE's risk classification and prioritization
+                for this investigation.
+              </p>
+
+            </div>
+
+          </div>
+
 
           <div className="investigation-detail-grid">
 
@@ -818,9 +1177,26 @@ function Investigation() {
 
         <div className="investigation-section">
 
-          <h2>
-            Governance & Review
-          </h2>
+          <div className="investigation-section-heading">
+
+            <div>
+
+              <span className="investigation-section-eyebrow">
+                HUMAN OVERSIGHT
+              </span>
+
+              <h2>
+                Governance & Review
+              </h2>
+
+              <p>
+                Human decision and final case governance state.
+              </p>
+
+            </div>
+
+          </div>
+
 
           <div className="investigation-detail-grid">
 

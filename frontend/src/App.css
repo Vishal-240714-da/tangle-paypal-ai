@@ -7043,3 +7043,1022 @@ body {
     max-width: 100%;
   }
 }
+/* ============================================================
+   PHASE 12 — AI EXPLAINABILITY POLISH
+   ============================================================ */
+
+.investigation-ai-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #666666;
+}
+
+
+/* ============================================================
+   EXPLAINABILITY SNAPSHOT
+   ============================================================ */
+
+.investigation-ai-snapshot {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+
+.investigation-ai-snapshot-item {
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.investigation-ai-snapshot-item span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #777777;
+}
+
+.investigation-ai-snapshot-item strong {
+  display: block;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.35;
+  color: #151515;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   PRIMARY FINDING
+   ============================================================ */
+
+.investigation-primary-finding {
+  margin: 8px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.65;
+  color: #171717;
+}
+
+.investigation-rationale {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-left: 3px solid #222222;
+  border-radius: 0 10px 10px 0;
+  background: #f7f7f7;
+}
+
+.investigation-rationale strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #555555;
+}
+
+.investigation-rationale p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444444;
+}
+
+
+/* ============================================================
+   STEP DESCRIPTION
+   ============================================================ */
+
+.investigation-step-description {
+  margin: 7px 0 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #707070;
+}
+
+
+/* ============================================================
+   REASONING TIMELINE
+   ============================================================ */
+
+.investigation-reasoning-timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.investigation-reasoning-timeline::before {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 15px;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.12);
+  content: "";
+}
+
+.investigation-reasoning-timeline li {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 0 0 18px;
+}
+
+.investigation-reasoning-timeline li:last-child {
+  padding-bottom: 0;
+}
+
+.investigation-reasoning-index {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 0 0 30px;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 50%;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  color: #222222;
+}
+
+.investigation-reasoning-text {
+  flex: 1;
+  padding-top: 5px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333333;
+}
+
+
+/* ============================================================
+   EVIDENCE SOURCE
+   ============================================================ */
+
+.investigation-evidence-source {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-bottom: 10px;
+  padding: 4px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  background: #f4f4f4;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666666;
+}
+
+
+/* ============================================================
+   EVIDENCE SUMMARY
+   ============================================================ */
+
+.investigation-evidence-summary {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.investigation-evidence-summary strong {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #555555;
+}
+
+.investigation-evidence-summary p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #555555;
+}
+
+
+/* ============================================================
+   CONFIDENCE EXPLANATION
+   ============================================================ */
+
+.investigation-confidence-description {
+  max-width: 760px;
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #707070;
+}
+
+
+/* ============================================================
+   FINAL GOVERNANCE NOTE
+   ============================================================ */
+
+.investigation-final-step {
+  margin-bottom: 0;
+}
+
+.investigation-governance-note {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.investigation-governance-note > div {
+  padding: 13px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.investigation-governance-note span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #777777;
+}
+
+.investigation-governance-note strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 750;
+  color: #202020;
+}
+
+
+/* ============================================================
+   PHASE 12 RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .investigation-ai-snapshot {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .investigation-ai-snapshot {
+    grid-template-columns: 1fr;
+  }
+
+  .investigation-ai-snapshot-item strong {
+    white-space: normal;
+  }
+
+  .investigation-primary-finding {
+    font-size: 15px;
+  }
+
+  .investigation-governance-note {
+    grid-template-columns: 1fr;
+  }
+
+  .investigation-reasoning-timeline li {
+    gap: 10px;
+  }
+
+}
+/* ============================================================
+   PHASE 12 — INVESTIGATION SECTION SPACING
+   ============================================================ */
+
+/* Create a clear visual break after Financial Analysis */
+.investigation-financial-analysis {
+  margin-bottom: 48px;
+}
+
+/* Give the Explainable AI section its own breathing room */
+.investigation-ai-section {
+  margin-top: 48px;
+  padding-top: 8px;
+}
+
+/* Stronger separation between major investigation sections */
+.investigation-ai-section + .investigation-section {
+  margin-top: 40px;
+}
+
+
+/* ============================================================
+   FALLBACK SPACING
+   ============================================================ */
+
+/* If the existing JSX uses generic section/card wrappers,
+   prevent adjacent major sections from visually touching. */
+
+.investigation-page .section {
+  margin-bottom: 40px;
+}
+
+.investigation-page .section + .section {
+  margin-top: 40px;
+}
+
+
+/* ============================================================
+   AI SECTION HEADER
+   ============================================================ */
+
+.investigation-ai-section .investigation-ai-eyebrow {
+  margin-top: 4px;
+}
+
+.investigation-ai-section h2 {
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.investigation-ai-section > p {
+  margin-bottom: 24px;
+}
+
+
+/* ============================================================
+   DESKTOP — MORE EXECUTIVE DASHBOARD SPACING
+   ============================================================ */
+
+@media (min-width: 901px) {
+
+  .investigation-financial-analysis {
+    margin-bottom: 56px;
+  }
+
+  .investigation-ai-section {
+    margin-top: 56px;
+  }
+
+}
+/* ============================================================
+   PHASE 12 — INVESTIGATION COMMAND HEADER
+   ============================================================ */
+
+.investigation-command-header {
+  margin-bottom: 44px;
+  padding: 28px 30px 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.investigation-command-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.investigation-command-back {
+  margin: 0;
+}
+
+.investigation-command-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+}
+
+.investigation-command-main {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 26px 0 24px;
+}
+
+.investigation-command-title {
+  min-width: 0;
+}
+
+.investigation-case-kicker {
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+}
+
+.investigation-command-title h1 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: #111111;
+}
+
+.investigation-command-title p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6f6f6f;
+}
+
+.investigation-command-status {
+  flex: 0 0 auto;
+  min-width: 150px;
+  padding: 13px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #f8f8f8;
+}
+
+.investigation-status-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888888;
+}
+
+.investigation-command-status strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: #202020;
+}
+
+.investigation-command-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.investigation-command-metrics {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(4, 1fr);
+  gap: 0;
+}
+
+.investigation-command-metric {
+  min-width: 0;
+  padding: 18px 20px 21px;
+  border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.investigation-command-metric:first-child {
+  padding-left: 0;
+}
+
+.investigation-command-metric:last-child {
+  border-right: 0;
+  padding-right: 0;
+}
+
+.investigation-command-metric span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #858585;
+}
+
+.investigation-command-metric strong {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #171717;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.investigation-command-exception {
+  font-size: 12px !important;
+}
+
+.investigation-risk-value {
+  color: #a51d1d !important;
+}
+
+.investigation-review-required {
+  color: #9a5b00 !important;
+}
+
+.investigation-review-not-required {
+  color: #28743f !important;
+}
+
+
+/* ============================================================
+   PHASE 12 — SECTION HEADERS
+   ============================================================ */
+
+.investigation-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.investigation-section-eyebrow {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+}
+
+.investigation-section-heading h2 {
+  margin: 0;
+}
+
+.investigation-section-heading p {
+  max-width: 700px;
+  margin: 7px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #747474;
+}
+
+
+/* ============================================================
+   PHASE 12 — FINANCIAL → AI SEPARATION
+   ============================================================ */
+
+.investigation-financial-section {
+  margin-bottom: 64px;
+}
+
+.investigation-ai-section {
+  margin-top: 0;
+  padding-top: 32px;
+  border-top: 1px solid rgba(0, 0, 0, 0.09);
+}
+
+
+/* ============================================================
+   PHASE 12 — AI HEADER
+   ============================================================ */
+
+.investigation-ai-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.investigation-ai-header h2 {
+  margin: 0;
+}
+
+.investigation-ai-header p {
+  max-width: 700px;
+  margin: 7px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #747474;
+}
+
+.ai-confidence-badge {
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding: 13px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #f8f8f8;
+  text-align: right;
+}
+
+.ai-confidence-badge span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #858585;
+}
+
+.ai-confidence-badge strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  color: #171717;
+}
+
+
+/* ============================================================
+   PHASE 12 — EXPLAINABILITY BLOCKS
+   ============================================================ */
+
+.explainable-investigation .investigation-explain-block,
+.explainable-investigation .investigation-evidence-container {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.explainable-investigation .investigation-explain-block:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.explainable-investigation .investigation-final-step {
+  padding-bottom: 0;
+}
+
+
+/* ============================================================
+   PHASE 12 — RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1000px) {
+
+  .investigation-command-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .investigation-command-metric:nth-child(3) {
+    border-right: 0;
+  }
+
+  .investigation-command-metric:nth-child(n + 4) {
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+  }
+
+  .investigation-command-metric:nth-child(4) {
+    padding-left: 0;
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .investigation-command-header {
+    padding: 22px 20px 0;
+    border-radius: 14px;
+  }
+
+  .investigation-command-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .investigation-command-title h1 {
+    font-size: 28px;
+  }
+
+  .investigation-command-status {
+    width: 100%;
+  }
+
+  .investigation-command-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .investigation-command-metric:nth-child(3) {
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+  }
+
+  .investigation-command-metric:nth-child(even) {
+    border-right: 0;
+  }
+
+  .investigation-command-metric:nth-child(n + 3) {
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+  }
+
+  .investigation-command-metric:first-child {
+    padding-left: 0;
+  }
+
+  .investigation-command-metric:nth-child(3),
+  .investigation-command-metric:nth-child(5) {
+    padding-left: 0;
+  }
+
+  .investigation-ai-header {
+    flex-direction: column;
+  }
+
+  .ai-confidence-badge {
+    width: 100%;
+    text-align: left;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .investigation-command-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .investigation-command-label {
+    display: none;
+  }
+
+  .investigation-command-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .investigation-command-metric,
+  .investigation-command-metric:nth-child(3),
+  .investigation-command-metric:nth-child(4),
+  .investigation-command-metric:nth-child(5) {
+    padding-left: 0;
+    padding-right: 0;
+    border-right: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+  }
+
+  .investigation-command-metric:first-child {
+    border-top: 0;
+  }
+
+}
+/* ============================================================
+   PHASE 12 — SIDEBAR SCROLL FIX
+   ============================================================ */
+
+/* Keep the sidebar fixed to the viewport */
+.sidebar {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ------------------------------------------------------------
+   Scrollable navigation area
+   ------------------------------------------------------------ */
+
+.sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+
+  /*
+   * Allows mouse-wheel / trackpad scrolling directly
+   * inside the navigation column.
+   */
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+
+/* ------------------------------------------------------------
+   Chrome / Edge / Windows scrollbar
+   ------------------------------------------------------------ */
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.30);
+}
+
+
+/* ------------------------------------------------------------
+   Keep footer visible while navigation scrolls
+   ------------------------------------------------------------ */
+
+.sidebar-footer {
+  flex: 0 0 auto;
+}
+
+
+/* ------------------------------------------------------------
+   Prevent navigation items from shrinking
+   ------------------------------------------------------------ */
+
+.sidebar-nav .nav-item {
+  flex-shrink: 0;
+}
+
+
+/* ------------------------------------------------------------
+   Small-screen protection
+   ------------------------------------------------------------ */
+
+@media (max-height: 700px) {
+
+  .sidebar-logo {
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav {
+    padding-top: 4px;
+    padding-bottom: 8px;
+  }
+
+}
+/* =========================================================
+   PHASE 12 — AI CONCLUSION
+   ========================================================= */
+
+.investigation-ai-conclusion {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr) 120px;
+  gap: 24px;
+  align-items: stretch;
+  margin: 0 0 30px;
+  padding: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.investigation-ai-conclusion-main {
+  min-width: 0;
+}
+
+.investigation-ai-conclusion-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #666666;
+}
+
+.investigation-ai-conclusion-main h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #111111;
+}
+
+.investigation-ai-conclusion-finding {
+  margin: 0;
+  max-width: 720px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.65;
+  color: #242424;
+}
+
+.investigation-ai-conclusion-details {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+}
+
+.investigation-ai-conclusion-details > div {
+  padding: 13px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.investigation-ai-conclusion-details span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #858585;
+}
+
+.investigation-ai-conclusion-details p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #444444;
+}
+
+.investigation-ai-conclusion-confidence {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 14px;
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.investigation-ai-conclusion-confidence span {
+  margin-bottom: 7px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #858585;
+}
+
+.investigation-ai-conclusion-confidence strong {
+  font-size: 25px;
+  font-weight: 800;
+  color: #111111;
+}
+
+
+/* =========================================================
+   PHASE 12 — AI CONCLUSION RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .investigation-ai-conclusion {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
+  }
+
+  .investigation-ai-conclusion-confidence {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 14px 0 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-left: 0;
+  }
+
+  .investigation-ai-conclusion-confidence span {
+    margin-bottom: 0;
+  }
+}
+
+
+@media (max-width: 700px) {
+  .investigation-ai-conclusion {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 20px;
+  }
+
+  .investigation-ai-conclusion-details {
+    grid-template-rows: auto;
+  }
+
+  .investigation-ai-conclusion-confidence {
+    grid-column: auto;
+    padding: 14px 0 0;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .investigation-ai-conclusion {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .investigation-ai-conclusion-finding {
+    font-size: 14px;
+  }
+}

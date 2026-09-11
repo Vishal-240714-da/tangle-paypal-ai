@@ -1,3 +1,4 @@
+import json
 import logging
 
 from fastapi import APIRouter, HTTPException
@@ -19,6 +20,10 @@ router = APIRouter(
 )
 
 
+# ============================================================
+# HELPERS
+# ============================================================
+
 def safe_float(value):
     try:
         if value is None:
@@ -27,6 +32,210 @@ def safe_float(value):
     except (TypeError, ValueError):
         return None
 
+
+def clean_explainable_text(value):
+    """
+    Normalize explainability text before returning it through the API.
+
+    Repairs malformed word concatenations found in older
+    investigation records.
+    """
+    if value is None:
+        return None
+
+    import re
+
+    text = str(value)
+
+    replacements = [
+        # Common investigation phrases
+        (r"Thepayment", "The payment"),
+        (r"PaymentPAY-", "Payment PAY-"),
+        (r"paymentrecord", "payment record"),
+        (r"paymentrecords", "payment records"),
+        (r"invoicerecord", "invoice record"),
+        (r"invoicerecords", "invoice records"),
+        (r"recordexists", "record exists"),
+
+        # Bank / statement phrases
+        (r"banktransaction", "bank transaction"),
+        (r"banktransactions", "bank transactions"),
+        (r"bankrecord", "bank record"),
+        (r"bankrecords", "bank records"),
+        (r"bankstatement", "bank statement"),
+        (r"bankstatements", "bank statements"),
+        (r"statemententry", "statement entry"),
+        (r"statemententries", "statement entries"),
+        (r"postinghistory", "posting history"),
+
+        # Payment / verification phrases
+        (r"paymenttherefore", "payment therefore"),
+        (r"thereforecannot", "therefore cannot"),
+        (r"paymentcannot", "payment cannot"),
+        (r"cannotbe", "cannot be"),
+        (r"cannotfully", "cannot fully"),
+        (r"cannotconfirm", "cannot confirm"),
+        (r"couldnotbe", "could not be"),
+        (r"couldnot", "could not"),
+        (r"wasnot", "was not"),
+        (r"werenot", "were not"),
+        (r"hasnot", "has not"),
+        (r"hasbeen", "has been"),
+        (r"notfound", "not found"),
+        (r"notmatched", "not matched"),
+        (r"notverified", "not verified"),
+        (r"notlocated", "not located"),
+        (r"notidentified", "not identified"),
+        (r"notavailable", "not available"),
+
+        # Modal / status phrases
+        (r"couldbe", "could be"),
+        (r"shouldbe", "should be"),
+        (r"wouldbe", "would be"),
+        (r"mayhave", "may have"),
+        (r"maynot", "may not"),
+        (r"wasfound", "was found"),
+        (r"wasidentified", "was identified"),
+        (r"wereidentified", "were identified"),
+        (r"isavailable", "is available"),
+        (r"isfound", "is found"),
+        (r"ismissing", "is missing"),
+        (r"isnot", "is not"),
+        (r"aremissing", "are missing"),
+        (r"areavailable", "are available"),
+
+        # Action phrases
+        (r"shouldbechecked", "should be checked"),
+        (r"needstobe", "needs to be"),
+        (r"needstocheck", "needs to check"),
+        (r"checkthe", "check the"),
+        (r"verifythe", "verify the"),
+        (r"searchthe", "search the"),
+        (r"reviewthe", "review the"),
+        (r"confirmthe", "confirm the"),
+        (r"comparethe", "compare the"),
+        (r"matchthe", "match the"),
+
+        # Connector phrases
+        (r"againstthe", "against the"),
+        (r"withthe", "with the"),
+        (r"fromthe", "from the"),
+        (r"inthe", "in the"),
+        (r"onthe", "on the"),
+        (r"tothe", "to the"),
+        (r"ofthe", "of the"),
+        (r"forthe", "for the"),
+
+        # Investigation wording
+        (r"determinewhether", "determine whether"),
+        (r"delayedor", "delayed or"),
+        (r"historyshould", "history should"),
+        (r"historyand", "history and"),
+        (r"amountcontains", "amount contains"),
+
+        # Financial wording
+        (r"financialrecords", "financial records"),
+        (r"financialstatus", "financial status"),
+        (r"financialimpact", "financial impact"),
+        (r"invoiceamount", "invoice amount"),
+        (r"paymentamount", "payment amount"),
+        (r"bankamount", "bank amount"),
+        (r"outstandingamount", "outstanding amount"),
+        (r"paymentfee", "payment fee"),
+
+        # Other TANGLE terminology
+        (r"paymentgateway", "payment gateway"),
+        (r"paymentdata", "payment data"),
+        (r"paymentstatus", "payment status"),
+        (r"risklevel", "risk level"),
+        (r"priorityscore", "priority score"),
+        (r"humanreviewrequired", "human review required"),
+        (r"humanreview", "human review"),
+
+        # Sentence spacing
+        (r"located\.The", "located. The"),
+        (r"records\.The", "records. The"),
+        (r"\.The", ". The"),
+        (r"\.This", ". This"),
+
+        # Comma spacing
+        (r",but", ", but"),
+        (r",and", ", and"),
+        (r",or", ", or"),
+        (r",which", ", which"),
+        (r",because", ", because"),
+        (r",then", ", then"),
+
+        # Financial summary spacing
+        (r"amount:2500\.00", "amount: 2500.00"),
+        (r"amount:\s*2500\.00\|", "amount: 2500.00 |"),
+        (r"Payment amount:\s*2500\.00\|", "Payment amount: 2500.00 |"),
+        (r"Outstanding amount:\s*0\.00\|", "Outstanding amount: 0.00 |"),
+
+        # Generic pipe spacing
+        (r"\s*\|\s*", " | "),
+    ]
+
+    for pattern, replacement in replacements:
+        text = re.sub(
+            pattern,
+            replacement,
+            text,
+        )
+
+    # Collapse accidental repeated whitespace.
+    text = re.sub(
+        r"[ \t]+",
+        " ",
+        text,
+    ).strip()
+
+    return text
+
+def clean_reasoning(value):
+    """
+    Convert stored JSON-encoded reasoning into a real list.
+
+    Older records may contain reasoning_steps as a JSON string
+    containing a list. Newer records may already contain a list.
+
+    If parsing fails, preserve the complete value as a single
+    reasoning step rather than returning malformed JSON text.
+    """
+    if value is None:
+        return []
+
+    if isinstance(value, list):
+        return [
+            clean_explainable_text(str(step))
+            for step in value
+        ]
+
+    text = str(value).strip()
+
+    if not text:
+        return []
+
+    try:
+        parsed = json.loads(text)
+
+        if isinstance(parsed, list):
+            return [
+                clean_explainable_text(str(step))
+                for step in parsed
+            ]
+
+    except (json.JSONDecodeError, TypeError, ValueError):
+        pass
+
+    return [
+        clean_explainable_text(text)
+    ]
+
+
+# ============================================================
+# EVIDENCE BUILDER
+# ============================================================
 
 def build_evidence(case):
     """
@@ -102,6 +311,10 @@ def build_evidence(case):
         )
     )
 
+    # --------------------------------------------------------
+    # INVOICE
+    # --------------------------------------------------------
+
     if invoice_amount is not None:
         evidence.append(
             {
@@ -113,6 +326,10 @@ def build_evidence(case):
                 "source": "Invoice",
             }
         )
+
+    # --------------------------------------------------------
+    # PAYMENT
+    # --------------------------------------------------------
 
     if payment_amount is not None:
         evidence.append(
@@ -126,6 +343,10 @@ def build_evidence(case):
             }
         )
 
+    # --------------------------------------------------------
+    # BANK
+    # --------------------------------------------------------
+
     if bank_amount is not None:
         evidence.append(
             {
@@ -138,7 +359,14 @@ def build_evidence(case):
             }
         )
 
-    if invoice_amount is not None and payment_amount is not None:
+    # --------------------------------------------------------
+    # CALCULATED FINANCIAL VALUES
+    # --------------------------------------------------------
+
+    if (
+        invoice_amount is not None
+        and payment_amount is not None
+    ):
         if outstanding_amount is None:
             outstanding_amount = max(
                 invoice_amount - payment_amount,
@@ -191,6 +419,10 @@ def build_evidence(case):
             }
         )
 
+    # --------------------------------------------------------
+    # BANK-PAYMENT DIFFERENCE
+    # --------------------------------------------------------
+
     if (
         payment_amount is not None
         and bank_amount is not None
@@ -211,7 +443,14 @@ def build_evidence(case):
             }
         )
 
-    if payment_fee is not None and payment_fee != 0:
+    # --------------------------------------------------------
+    # PAYMENT FEE
+    # --------------------------------------------------------
+
+    if (
+        payment_fee is not None
+        and payment_fee != 0
+    ):
         evidence.append(
             {
                 "label": "Payment Fee",
@@ -225,6 +464,10 @@ def build_evidence(case):
 
     return evidence
 
+
+# ============================================================
+# REVIEW DATA
+# ============================================================
 
 def get_review_data(review, case):
     if review is None:
@@ -280,6 +523,10 @@ def get_review_data(review, case):
         ),
     }
 
+
+# ============================================================
+# INVESTIGATION ENDPOINT
+# ============================================================
 
 @router.get(
     "/{case_id}",
@@ -532,26 +779,46 @@ def get_investigation(case_id: str):
             else investigation.confidence
         )
 
+        finding = (
+            investigation.investigation_finding
+            or investigation.finding
+            or investigation.hypothesis
+        )
+
+        likely_cause = investigation.likely_cause
+
+        recommendation = (
+            investigation.recommended_action
+            or investigation.recommendation
+        )
+
+        rationale = investigation.rationale
+
+        evidence_summary = investigation.evidence_summary
+
+        reasoning = clean_reasoning(
+            investigation.reasoning_steps
+        )
+
         ai_investigation = {
-            "finding": (
-                investigation.investigation_finding
-                or investigation.finding
-                or investigation.hypothesis
+            "finding": clean_explainable_text(
+                finding
             ),
-            "likely_cause":
-                investigation.likely_cause,
-            "recommendation": (
-                investigation.recommended_action
-                or investigation.recommendation
+            "likely_cause": clean_explainable_text(
+                likely_cause
+            ),
+            "recommendation": clean_explainable_text(
+                recommendation
             ),
             "confidence": confidence,
             "evidence": evidence,
-            "reasoning":
-                investigation.reasoning_steps,
-            "rationale":
-                investigation.rationale,
-            "evidence_summary":
-                investigation.evidence_summary,
+            "reasoning": reasoning,
+            "rationale": clean_explainable_text(
+                rationale
+            ),
+            "evidence_summary": clean_explainable_text(
+                evidence_summary
+            ),
         }
 
         # ----------------------------------------------------
@@ -667,22 +934,30 @@ def get_investigation(case_id: str):
 
         risk_response = {
             "risk_level":
-                getattr(
-                    risk,
-                    "risk_level",
-                    None,
-                ) if risk else getattr(
-                    case,
-                    "risk_level",
-                    None,
+                (
+                    getattr(
+                        risk,
+                        "risk_level",
+                        None,
+                    )
+                    if risk
+                    else getattr(
+                        case,
+                        "risk_level",
+                        None,
+                    )
                 ),
 
             "risk_score":
-                getattr(
-                    risk,
-                    "risk_score",
-                    None,
-                ) if risk else None,
+                (
+                    getattr(
+                        risk,
+                        "risk_score",
+                        None,
+                    )
+                    if risk
+                    else None
+                ),
 
             "priority_score":
                 getattr(
@@ -699,11 +974,15 @@ def get_investigation(case_id: str):
                 ),
 
             "risk_reason":
-                getattr(
-                    risk,
-                    "risk_reason",
-                    None,
-                ) if risk else None,
+                (
+                    getattr(
+                        risk,
+                        "risk_reason",
+                        None,
+                    )
+                    if risk
+                    else None
+                ),
         }
 
         logger.info(
