@@ -1,7 +1,9 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from backend.auth import get_current_user
 
+from backend.auth import get_current_user
 from backend.schemas.audit import AuditTrailResponse
 from backend.services.audit_service import (
     get_audit_trail,
@@ -26,6 +28,7 @@ router = APIRouter(
 )
 def get_case_audit_trail(
     case_id: str,
+    current_user=Depends(get_current_user),
 ):
     try:
         return get_audit_trail(case_id)

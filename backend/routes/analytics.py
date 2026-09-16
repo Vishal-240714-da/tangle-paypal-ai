@@ -1,8 +1,10 @@
 from collections import Counter
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from backend.auth import get_current_user
 from sqlalchemy import select
 
+from backend.auth import get_current_user
 from database.connection import SessionLocal
 from database.models import (
     BankTransaction,
@@ -99,7 +101,7 @@ def empty_analytics_response():
     "/summary",
     response_model=AnalyticsSummaryResponse,
 )
-def get_analytics_summary():
+def get_analytics_summary(current_user=Depends(get_current_user)):
     """
     Return the complete TANGLE analytics summary.
     """
@@ -438,7 +440,7 @@ def get_analytics_summary():
 # ============================================================
 
 @router.get("/risk")
-def get_risk_distribution():
+def get_risk_distribution(current_user=Depends(get_current_user),):
     """
     Return case risk distribution.
     """
@@ -459,7 +461,7 @@ def get_risk_distribution():
 # ============================================================
 
 @router.get("/exceptions")
-def get_exception_distribution():
+def get_exception_distribution(current_user=Depends(get_current_user),):
     """
     Return exception category distribution.
     """
@@ -480,7 +482,7 @@ def get_exception_distribution():
 # ============================================================
 
 @router.get("/lifecycle")
-def get_lifecycle_distribution():
+def get_lifecycle_distribution(current_user=Depends(get_current_user),):
     """
     Return authoritative case lifecycle distribution.
     """

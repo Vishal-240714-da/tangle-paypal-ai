@@ -1,6 +1,7 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from backend.auth import require_roles
 
 from backend.schemas.data_quality import DataQualityResponse
 from backend.services.data_quality_service import (
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
     "",
     response_model=DataQualityResponse,
 )
-def get_data_quality():
+def get_data_quality(current_user=Depends(require_roles("ADMIN", "ANALYST"))):
     """
     Run the TANGLE Data Quality Engine against
     the incoming financial datasets.

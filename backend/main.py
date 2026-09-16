@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.routes import (
     analytics,
     audit,
+    auth,
     cases,
     dashboard,
     data_quality,
@@ -16,6 +17,7 @@ from backend.routes import (
     investigation,
     reconciliation,
     review,
+    users,
 )
 
 
@@ -129,6 +131,12 @@ app.include_router(
 
 app.include_router(
     audit.router
+)
+app.include_router(
+    auth.router
+)
+app.include_router(
+    users.router
 )
 app.include_router(
     ingestion.router

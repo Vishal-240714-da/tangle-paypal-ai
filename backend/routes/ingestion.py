@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from backend.auth import require_roles
 
+from backend.auth import require_roles
 from backend.services.ingestion_service import (
     activate_staged_dataset,
     get_ingestion_status,
@@ -20,7 +22,11 @@ router = APIRouter(
 
 
 @router.get("/status")
-def ingestion_status():
+def ingestion_status(
+    current_user=Depends(
+        require_roles("ADMIN")
+    ),
+):
     """
     Return the current active/staging status
     of all Phase 10 datasets.
@@ -42,6 +48,9 @@ def ingestion_status():
 async def upload_dataset(
     dataset_name: str,
     file: UploadFile = File(...),
+    current_user=Depends(
+        require_roles("ADMIN")
+    ),
 ):
     """
     Upload a CSV dataset into staging.
@@ -77,6 +86,9 @@ async def upload_dataset(
 @router.post("/validate/{dataset_name}")
 def validate_dataset(
     dataset_name: str,
+    current_user=Depends(
+        require_roles("ADMIN")
+    ),
 ):
     """
     Run the FULL Data Quality Engine against
@@ -122,6 +134,9 @@ def validate_dataset(
 @router.post("/activate/{dataset_name}")
 def activate_dataset(
     dataset_name: str,
+    current_user=Depends(
+        require_roles("ADMIN")
+    ),
 ):
     """
     Validate and activate a staged dataset.
@@ -163,7 +178,11 @@ def activate_dataset(
 
 
 @router.post("/import")
-def import_datasets():
+def import_datasets(
+    current_user=Depends(
+        require_roles("ADMIN")
+    ),
+):
     """
     Import the currently active source datasets
     into PostgreSQL.
@@ -197,7 +216,11 @@ def import_datasets():
 
 
 @router.post("/validate")
-def validate_active_datasets():
+def validate_active_datasets(
+    current_user=Depends(
+        require_roles("ADMIN")
+    ),
+):
     """
     Run the full Data Quality Engine against
     the currently active datasets.

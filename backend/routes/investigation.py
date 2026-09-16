@@ -1,8 +1,9 @@
 import json
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
+from backend.auth import get_current_user
 
 from database.connection import SessionLocal
 from database.models import (
@@ -532,7 +533,7 @@ def get_review_data(review, case):
     "/{case_id}",
     summary="Get explainable investigation by case ID",
 )
-def get_investigation(case_id: str):
+def get_investigation(case_id: str, current_user=Depends(get_current_user)):
     case_id = case_id.strip()
 
     if not case_id:

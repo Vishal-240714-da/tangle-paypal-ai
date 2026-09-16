@@ -47,6 +47,17 @@ class User(Base):
         default="ANALYST",
     )
 
+    password_hash: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,

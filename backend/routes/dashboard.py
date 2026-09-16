@@ -1,11 +1,12 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 
+from backend.auth import get_current_user
 from backend.schemas.dashboard import DashboardSummaryResponse
 from database.connection import SessionLocal
-from database.models import Case, RiskAssessment
+from database.models import Case, RiskAssessment, User
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,9 @@ router = APIRouter(
         "financial metrics."
     ),
 )
-def dashboard_summary():
+def dashboard_summary(
+    current_user = Depends(get_current_user)
+):
     """
     Return the main TANGLE dashboard metrics.
 

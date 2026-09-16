@@ -1,6 +1,7 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from backend.auth import get_current_user, require_roles
 
 from agents.review_manager import (
     get_pending_reviews,
@@ -41,7 +42,7 @@ ALLOWED_DECISIONS = {
         "for human review, ordered by priority."
     ),
 )
-def pending_reviews():
+def pending_reviews(current_user=Depends(get_current_user)):
     try:
         reviews = get_pending_reviews()
 
@@ -73,7 +74,7 @@ def pending_reviews():
         "and escalated reviews."
     ),
 )
-def review_summary():
+def review_summary(current_user=Depends(get_current_user)):
     try:
         summary = get_review_summary()
 
@@ -105,6 +106,7 @@ def review_summary():
 def submit_review(
     case_id: str,
     request: ReviewRequest,
+    current_user=Depends(get_current_user)
 ):
     case_id = case_id.strip()
 

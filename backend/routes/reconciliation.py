@@ -1,5 +1,7 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
+
+from backend.auth import get_current_user
 
 from backend.schemas.reconciliation import ReconciliationResponse
 from backend.services.reconciliation_service import run_reconciliation
@@ -13,6 +15,7 @@ router = APIRouter(
 
 @router.get("", response_model=ReconciliationResponse)
 def get_reconciliation(
+    current_user=Depends(get_current_user),
     match_type: str | None = Query(
         default=None,
         description="Filter by EXACT, FUZZY, or MERGED_PAYMENT.",

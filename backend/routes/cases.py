@@ -1,7 +1,8 @@
 import logging
 import math
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from backend.auth import get_current_user
 from sqlalchemy import func, or_, select
 
 from backend.schemas.case import (
@@ -37,6 +38,7 @@ router = APIRouter(
     ),
 )
 def get_cases(
+    current_user=Depends(get_current_user),
     page: int = Query(
         default=1,
         ge=1,
@@ -268,6 +270,7 @@ def get_cases(
 )
 def get_case_by_id(
     case_id: str,
+    current_user=Depends(get_current_user),
 ):
     case_id = case_id.strip()
 
@@ -335,6 +338,7 @@ def get_case_by_id(
 )
 def get_case_history(
     case_id: str,
+    current_user=Depends(get_current_user),
 ):
     """
     Return all lifecycle history records for a case.
