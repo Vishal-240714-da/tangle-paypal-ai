@@ -102,23 +102,30 @@ function DataQuality() {
     return "critical";
   }, [data]);
 
-  if (loading) {
-    return (
-      <div className="page">
+if (loading) {
+  return (
+    <div className="page data-quality-page">
+      <div className="dq-header">
         <div className="page-header">
+          <div className="dq-eyebrow">
+            TANGLE CONTROL LAYER
+          </div>
+
           <h1>Data Quality</h1>
+
           <p>
-            Validate incoming financial data before reconciliation.
+            Validate incoming financial data before it reaches
+            reconciliation and exception processing.
           </p>
         </div>
-
-        <div className="dq-loading">
-          Running data quality checks...
-        </div>
       </div>
-    );
-  }
 
+      <div className="dq-loading">
+        Running data quality checks...
+      </div>
+    </div>
+  );
+}
   if (error) {
     return (
       <div className="page">
@@ -142,7 +149,9 @@ function DataQuality() {
       </div>
     );
   }
-
+  if (!data) {
+    return null;
+  } 
   return (
     <div className="page data-quality-page">
 
