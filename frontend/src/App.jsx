@@ -1,8 +1,8 @@
-
 import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
@@ -14,121 +14,130 @@ import DataQuality from "./pages/DataQuality";
 import Reconciliation from "./pages/Reconciliation";
 import AuditTrail from "./pages/AuditTrail";
 import DataIngestion from "./pages/DataIngestion";
+import Login from "./pages/Login";
 
 import Layout from "./components/Layout";
 
 import "./App.css";
 
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("tangle_token");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
+      <Routes>
 
-          {/* ==================================================
-              DASHBOARD
-              ================================================== */}
+        {/* LOGIN */}
 
-          <Route
-            path="/"
-            element={<Dashboard />}
-          />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-          {/* ==================================================
-              CASES
-              ================================================== */}
+        {/* PROTECTED APPLICATION */}
 
-          <Route
-            path="/cases"
-            element={<Cases />}
-          />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Routes>
 
-          {/* ==================================================
-              DATA QUALITY
-              ================================================== */}
+                  {/* DASHBOARD */}
 
-          <Route
-            path="/data-quality"
-            element={<DataQuality />}
-          />
+                  <Route
+                    path="/"
+                    element={<Dashboard />}
+                  />
 
-          {/* ==================================================
-              DATA INGESTION
-              ================================================== */}
+                  {/* CASES */}
 
-          <Route
-            path="/data-ingestion"
-            element={<DataIngestion />}
-          />
+                  <Route
+                    path="/cases"
+                    element={<Cases />}
+                  />
 
-          {/* ==================================================
-              RECONCILIATION
-              ================================================== */}
+                  {/* DATA QUALITY */}
 
-          <Route
-            path="/reconciliation"
-            element={<Reconciliation />}
-          />
+                  <Route
+                    path="/data-quality"
+                    element={<DataQuality />}
+                  />
 
-          {/* ==================================================
-              INVESTIGATION
-              ================================================== */}
+                  {/* DATA INGESTION */}
 
-          <Route
-            path="/investigation/:caseId"
-            element={<Investigation />}
-          />
+                  <Route
+                    path="/data-ingestion"
+                    element={<DataIngestion />}
+                  />
 
-          {/* ==================================================
-              HUMAN REVIEW
-              ================================================== */}
+                  {/* RECONCILIATION */}
 
-          <Route
-            path="/review"
-            element={<Review />}
-          />
+                  <Route
+                    path="/reconciliation"
+                    element={<Reconciliation />}
+                  />
 
-          {/* ==================================================
-              AUDIT TRAIL
-              ================================================== */}
+                  {/* INVESTIGATION */}
 
-          <Route
-            path="/audit"
-            element={<AuditTrail />}
-          />
+                  <Route
+                    path="/investigation/:caseId"
+                    element={<Investigation />}
+                  />
 
-          {/* ==================================================
-              ANALYTICS
-              ================================================== */}
+                  {/* HUMAN REVIEW */}
 
-          <Route
-            path="/analytics"
-            element={<Analytics />}
-          />
+                  <Route
+                    path="/review"
+                    element={<Review />}
+                  />
 
-          {/* ==================================================
-              UNKNOWN ROUTE
-              ================================================== */}
+                  {/* AUDIT TRAIL */}
 
-          <Route
-            path="*"
-            element={
-              <div className="page">
-                <div className="page-header">
-                  <h1>
-                    Page Not Found
-                  </h1>
+                  <Route
+                    path="/audit"
+                    element={<AuditTrail />}
+                  />
 
-                  <p>
-                    The requested TANGLE page does not exist.
-                  </p>
-                </div>
-              </div>
-            }
-          />
+                  {/* ANALYTICS */}
 
-        </Routes>
-      </Layout>
+                  <Route
+                    path="/analytics"
+                    element={<Analytics />}
+                  />
+
+                  {/* UNKNOWN ROUTE */}
+
+                  <Route
+                    path="*"
+                    element={
+                      <div className="page">
+                        <div className="page-header">
+                          <h1>Page Not Found</h1>
+
+                          <p>
+                            The requested TANGLE page does not exist.
+                          </p>
+                        </div>
+                      </div>
+                    }
+                  />
+
+                </Routes>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+      </Routes>
     </BrowserRouter>
   );
 }

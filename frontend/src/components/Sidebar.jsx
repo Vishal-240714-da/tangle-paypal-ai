@@ -1,171 +1,95 @@
 import { NavLink } from "react-router-dom";
 
 function Sidebar() {
+  const navigationItems = [
+    {
+      path: "/",
+      label: "Dashboard",
+      icon: "▦",
+    },
+    {
+      path: "/cases",
+      label: "Cases",
+      icon: "◫",
+    },
+    {
+      path: "/data-quality",
+      label: "Data Quality",
+      icon: "✓",
+    },
+    {
+      path: "/data-ingestion",
+      label: "Data Ingestion",
+      icon: "⇩",
+    },
+    {
+      path: "/reconciliation",
+      label: "Reconciliation",
+      icon: "⇄",
+    },
+    {
+      path: "/review",
+      label: "Human Review",
+      icon: "◉",
+    },
+    {
+      path: "/audit",
+      label: "Audit Trail",
+      icon: "◌",
+    },
+    {
+      path: "/analytics",
+      label: "Analytics",
+      icon: "↗",
+    },
+  ];
+
   return (
     <aside className="sidebar">
-
-      {/* ==================================================
-          LOGO
-          ================================================== */}
-
+      {/* Brand */}
       <div className="sidebar-logo">
+        <div className="logo-mark">T</div>
 
-        <div className="logo-mark">
-          T
-        </div>
-
-        <div>
+        <div className="logo-text">
           <h2>TANGLE</h2>
           <span>Finance Intelligence</span>
         </div>
-
       </div>
 
-
-      {/* ==================================================
-          NAVIGATION
-          ================================================== */}
+      {/* Navigation */}
+      <div className="sidebar-section-title">WORKSPACE</div>
 
       <nav className="sidebar-nav">
-
-        {/* DASHBOARD */}
-
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>▦</span>
-          Dashboard
-        </NavLink>
-
-
-        {/* CASES */}
-
-        <NavLink
-          to="/cases"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>□</span>
-          Cases
-        </NavLink>
-
-
-        {/* DATA QUALITY */}
-
-        <NavLink
-          to="/data-quality"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>✓</span>
-          Data Quality
-        </NavLink>
-
-
-        {/* DATA INGESTION */}
-
-        <NavLink
-          to="/data-ingestion"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>⇩</span>
-          Data Ingestion
-        </NavLink>
-
-
-        {/* RECONCILIATION */}
-
-        <NavLink
-          to="/reconciliation"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>⇄</span>
-          Reconciliation
-        </NavLink>
-
-
-        {/* HUMAN REVIEW */}
-
-        <NavLink
-          to="/review"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>◉</span>
-          Human Review
-        </NavLink>
-
-
-        {/* AUDIT TRAIL */}
-
-        <NavLink
-          to="/audit"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>◌</span>
-          Audit Trail
-        </NavLink>
-
-
-        {/* ANALYTICS */}
-
-        <NavLink
-          to="/analytics"
-          className={({ isActive }) =>
-            isActive
-              ? "nav-item active"
-              : "nav-item"
-          }
-        >
-          <span>↗</span>
-          Analytics
-        </NavLink>
-
+        {navigationItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.path === "/"}
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            <span className="nav-icon">{item.icon}</span>
+            <span className="nav-label">{item.label}</span>
+          </NavLink>
+        ))}
       </nav>
 
-
-      {/* ==================================================
-          SYSTEM STATUS
-          ================================================== */}
-
+      {/* Bottom status */}
       <div className="sidebar-footer">
-
         <div className="system-status">
-
           <span className="status-dot"></span>
 
-          System Operational
-
+          <div>
+            <strong>System Operational</strong>
+            <small>All services running</small>
+          </div>
         </div>
 
+        <div className="sidebar-version">
+          TANGLE Enterprise
+        </div>
       </div>
-
     </aside>
   );
 }

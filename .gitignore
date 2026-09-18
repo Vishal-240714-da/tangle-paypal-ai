@@ -63,3 +63,6 @@ frontend/.vite/
 
 # TANGLE staging data
 staging/
+# Local UI rollback backups
+frontend_UI0_backup/
+frontend/src/App.css.backup
