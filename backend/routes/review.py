@@ -142,6 +142,7 @@ def submit_review(
             case_id=case_id,
             reviewer_decision=decision,
             reviewer_comment=comment,
+            reviewer=current_user.name,
         )
 
         logger.info(
