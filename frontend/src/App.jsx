@@ -15,6 +15,7 @@ import Reconciliation from "./pages/Reconciliation";
 import AuditTrail from "./pages/AuditTrail";
 import DataIngestion from "./pages/DataIngestion";
 import Login from "./pages/Login";
+import UIShowcase from "./pages/UIShowcase";
 
 import Layout from "./components/Layout";
 
@@ -35,6 +36,10 @@ function App() {
     <BrowserRouter>
       <Routes>
 
+        <Route
+          path="/ui-showcase"
+          element={<UIShowcase />}
+        />
         {/* LOGIN */}
 
         <Route
