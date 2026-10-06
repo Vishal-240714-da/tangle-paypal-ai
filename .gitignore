@@ -66,3 +66,7 @@ staging/
 # Local UI rollback backups
 frontend_UI0_backup/
 frontend/src/App.css.backup
+
+# Local backup files
+backend/services/ingestion_service-VISHAL_THIRUNAV.py
+tangle_before_review_normalization.dump

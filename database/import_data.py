@@ -1029,6 +1029,17 @@ def import_reviews(
                 row.get("final_status")
             ),
         }
+        # ----------------------------------------------------
+        # Synchronize the imported case lifecycle state.
+        #
+        # review_queue.csv is authoritative for imported
+        # human-review lifecycle state.
+        # ----------------------------------------------------
+
+        imported_case_status = values["case_status"]
+
+        if imported_case_status:
+            case.status = imported_case_status
 
         if review is None:
 

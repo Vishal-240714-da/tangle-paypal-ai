@@ -1,4 +1,19 @@
 import { useEffect, useState } from "react";
+import {
+  Upload,
+  Database,
+  FileSpreadsheet,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  ArrowRight,
+  RefreshCw,
+  ShieldCheck,
+  Activity,
+  Server,
+  CircleDot,
+} from "lucide-react";
+
 import api from "../services/api";
 
 function DataIngestion() {
@@ -19,13 +34,9 @@ function DataIngestion() {
 
   const loadStatus = async () => {
     try {
-      const response = await api.get(
-        "/api/ingestion/status"
-      );
+      const response = await api.get("/api/ingestion/status");
 
-      setDatasets(
-        response.data.datasets || {}
-      );
+      setDatasets(response.data.datasets || {});
     } catch (err) {
       setError(
         err.response?.data?.detail ||
@@ -38,9 +49,25 @@ function DataIngestion() {
     loadStatus();
   }, []);
 
+  const handleDatasetChange = (name) => {
+    setSelectedDataset(name);
+    setSelectedFile(null);
+    setValidation(null);
+    setImportResult(null);
+    setMessage("");
+    setError("");
+
+    const fileInput = document.getElementById(
+      "ingestion-file-input"
+    );
+
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
   const handleFileChange = (event) => {
-    const file =
-      event.target.files?.[0] || null;
+    const file = event.target.files?.[0] || null;
 
     setSelectedFile(file);
     setValidation(null);
@@ -64,18 +91,14 @@ function DataIngestion() {
     try {
       const formData = new FormData();
 
-      formData.append(
-        "file",
-        selectedFile
-      );
+      formData.append("file", selectedFile);
 
       const response = await api.post(
         `/api/ingestion/upload/${selectedDataset}`,
         formData,
         {
           headers: {
-            "Content-Type":
-              "multipart/form-data",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -87,10 +110,9 @@ function DataIngestion() {
 
       setSelectedFile(null);
 
-      const fileInput =
-        document.getElementById(
-          "ingestion-file-input"
-        );
+      const fileInput = document.getElementById(
+        "ingestion-file-input"
+      );
 
       if (fileInput) {
         fileInput.value = "";
@@ -117,9 +139,7 @@ function DataIngestion() {
         `/api/ingestion/validate/${selectedDataset}`
       );
 
-      setValidation(
-        response.data.quality
-      );
+      setValidation(response.data.quality);
 
       setMessage(
         "Full Data Quality validation completed."
@@ -152,8 +172,7 @@ function DataIngestion() {
       );
 
       setValidation(
-        response.data.activation?.validation ||
-          null
+        response.data.activation?.validation || null
       );
 
       setSelectedFile(null);
@@ -200,8 +219,7 @@ function DataIngestion() {
     }
   };
 
-  const selectedStatus =
-    datasets[selectedDataset];
+  const selectedStatus = datasets[selectedDataset];
 
   const hasStagedDataset =
     selectedStatus?.staging?.exists === true;
@@ -236,58 +254,176 @@ function DataIngestion() {
     (paymentImport?.skipped ?? 0) +
     (bankImport?.skipped ?? 0);
 
+  const datasetLabel = (name) => {
+    if (name === "bank_transactions") {
+      return "Bank Transactions";
+    }
+
+    return (
+      name.charAt(0).toUpperCase() +
+      name.slice(1)
+    );
+  };
+
   return (
     <div className="page ingestion-page">
 
-      {/* PAGE HEADER */}
-
-      <div className="page-header">
+      {/* HEADER */}
+      <div className="ingestion-hero">
         <div>
+          <div className="section-eyebrow">
+            TANGLE CONTROL LAYER
+          </div>
+
           <h1>Data Ingestion</h1>
 
           <p>
-            Upload, validate, activate, and
-            import TANGLE source datasets safely.
+            Upload, validate, activate, and import
+            TANGLE source datasets safely.
           </p>
         </div>
+
+        <button
+          type="button"
+          className="ingestion-refresh-button"
+          onClick={loadStatus}
+        >
+          <RefreshCw size={15} />
+          Refresh Status
+        </button>
       </div>
 
-      {/* GLOBAL SUCCESS MESSAGE */}
-
+      {/* GLOBAL MESSAGES */}
       {message && (
-        <div className="ingestion-message success">
-          {message}
+        <div className="ingestion-alert success">
+          <CheckCircle2 size={18} />
+
+          <div>
+            <strong>Operation successful</strong>
+            <span>{message}</span>
+          </div>
         </div>
       )}
-
-      {/* GLOBAL ERROR MESSAGE */}
 
       {error && (
-        <div className="ingestion-message error">
-          {error}
+        <div className="ingestion-alert error">
+          <XCircle size={18} />
+
+          <div>
+            <strong>Operation failed</strong>
+            <span>{error}</span>
+          </div>
         </div>
       )}
 
-      {/* DATASET + UPLOAD */}
+      {/* PIPELINE */}
+      <section className="ingestion-card ingestion-pipeline-card">
 
-      <div className="ingestion-grid">
+        <div className="ingestion-section-heading">
+          <div>
+            <div className="section-eyebrow">
+              CONTROLLED WORKFLOW
+            </div>
+
+            <h2>Ingestion Pipeline</h2>
+
+            <p>
+              Every source dataset passes through a
+              controlled validation and activation flow.
+            </p>
+          </div>
+        </div>
+
+        <div className="modern-pipeline">
+
+          <div className="pipeline-node active">
+            <div className="pipeline-icon">
+              <Upload size={17} />
+            </div>
+
+            <div>
+              <strong>Upload</strong>
+              <span>CSV → staging</span>
+            </div>
+          </div>
+
+          <ArrowRight className="pipeline-connector" size={18} />
+
+          <div
+            className={`pipeline-node ${
+              hasStagedDataset ? "active" : ""
+            }`}
+          >
+            <div className="pipeline-icon">
+              <ShieldCheck size={17} />
+            </div>
+
+            <div>
+              <strong>Validate</strong>
+              <span>Quality checks</span>
+            </div>
+          </div>
+
+          <ArrowRight className="pipeline-connector" size={18} />
+
+          <div
+            className={`pipeline-node ${
+              activationAllowed ? "active" : ""
+            }`}
+          >
+            <div className="pipeline-icon">
+              <CheckCircle2 size={17} />
+            </div>
+
+            <div>
+              <strong>Activate</strong>
+              <span>Safe dataset</span>
+            </div>
+          </div>
+
+          <ArrowRight className="pipeline-connector" size={18} />
+
+          <div
+            className={`pipeline-node ${
+              importResult ? "active" : ""
+            }`}
+          >
+            <div className="pipeline-icon">
+              <Database size={17} />
+            </div>
+
+            <div>
+              <strong>Import</strong>
+              <span>PostgreSQL</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* DATASET + UPLOAD */}
+      <div className="ingestion-main-grid">
 
         {/* DATASET STATUS */}
-
         <section className="ingestion-card">
 
           <div className="ingestion-card-header">
+
+            <div className="ingestion-heading-icon blue">
+              <Database size={18} />
+            </div>
+
             <div>
               <h2>Dataset Status</h2>
 
               <p>
-                Current active and staged
-                source datasets.
+                Active and staged source datasets.
               </p>
             </div>
+
           </div>
 
-          <div className="ingestion-dataset-list">
+          <div className="dataset-list">
 
             {Object.entries(datasets).map(
               ([name, dataset]) => {
@@ -305,56 +441,48 @@ function DataIngestion() {
                   <button
                     key={name}
                     type="button"
-                    className={
-                      `ingestion-dataset-row ${
-                        isSelected
-                          ? "selected"
-                          : ""
-                      }`
+                    className={`dataset-row ${
+                      isSelected ? "selected" : ""
+                    }`}
+                    onClick={() =>
+                      handleDatasetChange(name)
                     }
-                    onClick={() => {
-                      setSelectedDataset(name);
-                      setValidation(null);
-                      setImportResult(null);
-                      setMessage("");
-                      setError("");
-                    }}
                   >
 
-                    <div className="ingestion-dataset-main">
+                    <div className="dataset-row-icon">
+                      <FileSpreadsheet size={17} />
+                    </div>
+
+                    <div className="dataset-main">
 
                       <strong>
-                        {name ===
-                        "bank_transactions"
-                          ? "Bank Transactions"
-                          : name
-                              .charAt(0)
-                              .toUpperCase() +
-                            name.slice(1)}
+                        {datasetLabel(name)}
                       </strong>
 
                       <span>
-                        {dataset.filename}
+                        {dataset.filename ||
+                          "No dataset file"}
                       </span>
 
                     </div>
 
-                    <div className="ingestion-status-badges">
+                    <div className="dataset-status">
 
                       <span
-                        className={
+                        className={`status-pill ${
                           active
-                            ? "status-badge active"
-                            : "status-badge inactive"
-                        }
+                            ? "active"
+                            : "inactive"
+                        }`}
                       >
+                        <CircleDot size={10} />
                         {active
                           ? "ACTIVE"
                           : "INACTIVE"}
                       </span>
 
                       {staged && (
-                        <span className="status-badge staged">
+                        <span className="status-pill staged">
                           STAGED
                         </span>
                       )}
@@ -367,28 +495,28 @@ function DataIngestion() {
             )}
 
           </div>
-
         </section>
 
-
         {/* UPLOAD */}
-
         <section className="ingestion-card">
 
           <div className="ingestion-card-header">
+
+            <div className="ingestion-heading-icon purple">
+              <Upload size={18} />
+            </div>
 
             <div>
               <h2>Upload Dataset</h2>
 
               <p>
-                Upload a CSV into the staging
-                area before activation.
+                Upload a CSV into the staging area.
               </p>
             </div>
 
           </div>
 
-          <div className="ingestion-form">
+          <div className="ingestion-upload-area">
 
             <label htmlFor="dataset-select">
               Dataset
@@ -397,17 +525,12 @@ function DataIngestion() {
             <select
               id="dataset-select"
               value={selectedDataset}
-              onChange={(event) => {
-                setSelectedDataset(
+              onChange={(event) =>
+                handleDatasetChange(
                   event.target.value
-                );
-                setValidation(null);
-                setImportResult(null);
-                setMessage("");
-                setError("");
-              }}
+                )
+              }
             >
-
               <option value="invoices">
                 Invoices
               </option>
@@ -419,12 +542,35 @@ function DataIngestion() {
               <option value="bank_transactions">
                 Bank Transactions
               </option>
-
             </select>
-
 
             <label htmlFor="ingestion-file-input">
               CSV File
+            </label>
+
+            <label
+              htmlFor="ingestion-file-input"
+              className={`upload-dropzone ${
+                selectedFile ? "has-file" : ""
+              }`}
+            >
+              <div className="upload-dropzone-icon">
+                <Upload size={22} />
+              </div>
+
+              <strong>
+                {selectedFile
+                  ? selectedFile.name
+                  : "Choose a CSV file"}
+              </strong>
+
+              <span>
+                {selectedFile
+                  ? `${(
+                      selectedFile.size / 1024
+                    ).toFixed(1)} KB selected`
+                  : "CSV files only"}
+              </span>
             </label>
 
             <input
@@ -434,181 +580,41 @@ function DataIngestion() {
               onChange={handleFileChange}
             />
 
-
-            {selectedFile && (
-              <div className="selected-file">
-                <strong>
-                  Selected:
-                </strong>{" "}
-                {selectedFile.name}
-              </div>
-            )}
-
-
             <button
               type="button"
-              className="primary-button"
+              className="primary-button ingestion-primary-button"
               onClick={handleUpload}
               disabled={
-                uploading ||
-                !selectedFile
+                uploading || !selectedFile
               }
             >
+              <Upload size={16} />
+
               {uploading
                 ? "Uploading..."
                 : "Upload to Staging"}
             </button>
 
           </div>
-
         </section>
 
       </div>
 
-
-      {/* PIPELINE */}
-
-      <section className="ingestion-card ingestion-pipeline-card">
-
-        <div className="ingestion-card-header">
-
-          <div>
-            <h2>Ingestion Pipeline</h2>
-
-            <p>
-              The selected dataset follows
-              TANGLE's controlled ingestion flow.
-            </p>
-          </div>
-
-        </div>
-
-
-        <div className="ingestion-pipeline">
-
-          <div className="pipeline-step complete">
-
-            <span className="pipeline-number">
-              1
-            </span>
-
-            <div>
-              <strong>Upload</strong>
-
-              <span>
-                CSV → staging
-              </span>
-            </div>
-
-          </div>
-
-
-          <div className="pipeline-arrow">
-            →
-          </div>
-
-
-          <div
-            className={
-              `pipeline-step ${
-                hasStagedDataset
-                  ? "complete"
-                  : ""
-              }`
-            }
-          >
-
-            <span className="pipeline-number">
-              2
-            </span>
-
-            <div>
-              <strong>Validate</strong>
-
-              <span>
-                Structural + Data Quality
-              </span>
-            </div>
-
-          </div>
-
-
-          <div className="pipeline-arrow">
-            →
-          </div>
-
-
-          <div
-            className={
-              `pipeline-step ${
-                activationAllowed
-                  ? "complete"
-                  : ""
-              }`
-            }
-          >
-
-            <span className="pipeline-number">
-              3
-            </span>
-
-            <div>
-              <strong>Activate</strong>
-
-              <span>
-                Safe active dataset
-              </span>
-            </div>
-
-          </div>
-
-
-          <div className="pipeline-arrow">
-            →
-          </div>
-
-
-          <div
-            className={
-              `pipeline-step ${
-                importResult
-                  ? "complete"
-                  : ""
-              }`
-            }
-          >
-
-            <span className="pipeline-number">
-              4
-            </span>
-
-            <div>
-              <strong>Import</strong>
-
-              <span>
-                PostgreSQL
-              </span>
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
       {/* VALIDATION */}
-
       <section className="ingestion-card">
 
         <div className="ingestion-card-header">
+
+          <div className="ingestion-heading-icon green">
+            <ShieldCheck size={18} />
+          </div>
 
           <div>
             <h2>Data Quality Validation</h2>
 
             <p>
-              Run the complete Data Quality
-              Engine against the staged dataset.
+              Run the complete Data Quality Engine
+              against the staged dataset.
             </p>
           </div>
 
@@ -621,6 +627,8 @@ function DataIngestion() {
               !hasStagedDataset
             }
           >
+            <Activity size={15} />
+
             {validating
               ? "Validating..."
               : "Run Validation"}
@@ -628,74 +636,63 @@ function DataIngestion() {
 
         </div>
 
-
         {!hasStagedDataset && (
-          <div className="ingestion-empty">
-            Upload a dataset to staging before
-            running validation.
+          <div className="ingestion-empty-state">
+            <AlertTriangle size={17} />
+
+            <div>
+              <strong>
+                Dataset not ready for validation
+              </strong>
+
+              <span>
+                Upload a dataset to staging before
+                running validation.
+              </span>
+            </div>
           </div>
         )}
 
-
         {validation && (
-          <div className="ingestion-validation">
+          <div className="validation-panel">
 
             <div className="validation-metrics">
 
-              <div className="validation-metric">
-                <span>
-                  Quality Score
-                </span>
-
-                <strong>
+              <div className="validation-stat">
+                <span>Quality Score</span>
+                <strong className="quality-score">
                   {validation.quality_score}%
                 </strong>
               </div>
 
-
-              <div className="validation-metric">
-                <span>
-                  Total Records
-                </span>
-
+              <div className="validation-stat">
+                <span>Total Records</span>
                 <strong>
                   {validation.total_records}
                 </strong>
               </div>
 
-
-              <div className="validation-metric">
-                <span>
-                  Valid Records
-                </span>
-
+              <div className="validation-stat">
+                <span>Valid Records</span>
                 <strong>
                   {validation.valid_records}
                 </strong>
               </div>
 
-
-              <div className="validation-metric">
-                <span>
-                  Warnings
-                </span>
-
-                <strong>
+              <div className="validation-stat">
+                <span>Warnings</span>
+                <strong className="warning-number">
                   {validation.warnings}
                 </strong>
               </div>
 
-
-              <div className="validation-metric">
-                <span>
-                  Errors
-                </span>
-
+              <div className="validation-stat">
+                <span>Errors</span>
                 <strong
                   className={
                     hasErrors
-                      ? "metric-error"
-                      : "metric-success"
+                      ? "error-number"
+                      : "success-number"
                   }
                 >
                   {validation.errors}
@@ -704,27 +701,26 @@ function DataIngestion() {
 
             </div>
 
-
-            <div className="validation-decision">
-
+            <div
+              className={`activation-panel ${
+                activationAllowed
+                  ? "allowed"
+                  : "blocked"
+              }`}
+            >
               <div>
+
                 <span>
                   Activation Decision
                 </span>
 
-                <strong
-                  className={
-                    activationAllowed
-                      ? "decision-allowed"
-                      : "decision-blocked"
-                  }
-                >
+                <strong>
                   {activationAllowed
                     ? "ALLOWED"
                     : "BLOCKED"}
                 </strong>
-              </div>
 
+              </div>
 
               {activationAllowed && (
                 <button
@@ -733,6 +729,8 @@ function DataIngestion() {
                   onClick={handleActivate}
                   disabled={activating}
                 >
+                  <CheckCircle2 size={16} />
+
                   {activating
                     ? "Activating..."
                     : "Activate Dataset"}
@@ -741,49 +739,71 @@ function DataIngestion() {
 
             </div>
 
-
             {validation.issues?.length > 0 && (
               <div className="validation-issues">
 
-                <h3>
-                  Validation Issues
-                </h3>
+                <div className="validation-issues-header">
+                  <div>
+                    <h3>Validation Issues</h3>
+                    <p>
+                      Problems detected during
+                      quality validation.
+                    </p>
+                  </div>
 
-                {validation.issues.map(
-                  (issue, index) => (
-                    <div
-                      key={`${issue.record_id}-${index}`}
-                      className={
-                        `validation-issue ${
-                          issue.severity ===
-                          "ERROR"
+                  <span>
+                    {validation.issues.length} issue
+                    {validation.issues.length !== 1
+                      ? "s"
+                      : ""}
+                  </span>
+                </div>
+
+                <div className="issue-list">
+
+                  {validation.issues.map(
+                    (issue, index) => (
+                      <div
+                        key={`${issue.record_id}-${index}`}
+                        className={`issue-row ${
+                          issue.severity === "ERROR"
                             ? "error"
                             : "warning"
-                        }`
-                      }
-                    >
+                        }`}
+                      >
 
-                      <div>
-                        <strong>
-                          {issue.issue_type}
-                        </strong>
+                        <div className="issue-icon">
+                          {issue.severity ===
+                          "ERROR" ? (
+                            <XCircle size={17} />
+                          ) : (
+                            <AlertTriangle size={17} />
+                          )}
+                        </div>
 
-                        {issue.record_id && (
-                          <span>
-                            {" "}
-                            · {issue.record_id}
-                          </span>
-                        )}
+                        <div className="issue-content">
+
+                          <strong>
+                            {issue.issue_type}
+                          </strong>
+
+                          {issue.record_id && (
+                            <span className="issue-record">
+                              {issue.record_id}
+                            </span>
+                          )}
+
+                          <p>
+                            {issue.message}
+                          </p>
+
+                        </div>
+
                       </div>
+                    )
+                  )}
 
-                      <p>
-                        {issue.message}
-                      </p>
-
-                    </div>
-                  )
-                )}
-
+                </div>
               </div>
             )}
 
@@ -792,22 +812,23 @@ function DataIngestion() {
 
       </section>
 
-
-      {/* POSTGRESQL IMPORT */}
-
+      {/* POSTGRES IMPORT */}
       <section className="ingestion-card">
 
         <div className="ingestion-card-header">
+
+          <div className="ingestion-heading-icon blue">
+            <Server size={18} />
+          </div>
 
           <div>
             <h2>PostgreSQL Import</h2>
 
             <p>
-              Import the currently active source
-              datasets into TANGLE's database.
+              Import currently active source datasets
+              into TANGLE's database.
             </p>
           </div>
-
 
           <button
             type="button"
@@ -815,6 +836,8 @@ function DataIngestion() {
             onClick={handleImport}
             disabled={importing}
           >
+            <Database size={15} />
+
             {importing
               ? "Importing..."
               : "Import Active Data"}
@@ -822,26 +845,24 @@ function DataIngestion() {
 
         </div>
 
+        <div className="import-note">
+          <ShieldCheck size={17} />
 
-        <div className="ingestion-import-note">
-          Import affects only invoices, payments,
-          and bank transactions. Existing cases,
-          investigations, risk assessments, and
-          reviews are not modified.
+          <span>
+            Import affects only invoices, payments,
+            and bank transactions. Existing cases,
+            investigations, risk assessments, and
+            reviews are not modified.
+          </span>
         </div>
 
-
-        {/* IMPORT SUMMARY */}
-
         {importResult?.datasets && (
-          <div className="ingestion-import-summary">
+          <div className="import-result">
 
-            <div className="ingestion-import-summary-header">
+            <div className="import-result-header">
 
               <div>
-                <h3>
-                  Import Summary
-                </h3>
+                <h3>Import Summary</h3>
 
                 <p>
                   Active source datasets were
@@ -850,100 +871,56 @@ function DataIngestion() {
                 </p>
               </div>
 
-              <span className="import-success-badge">
+              <span className="import-success">
+                <CheckCircle2 size={14} />
                 IMPORT SUCCESS
               </span>
 
             </div>
 
+            <div className="import-dataset-stats">
 
-            <div className="ingestion-import-stats">
-
-              <div className="import-stat">
-
-                <span>
-                  Invoices
-                </span>
-
+              <div>
+                <span>Invoices</span>
                 <strong>
                   {invoiceImport?.updated ?? 0}
                 </strong>
-
-                <small>
-                  updated
-                </small>
-
+                <small>updated</small>
               </div>
 
-
-              <div className="import-stat">
-
-                <span>
-                  Payments
-                </span>
-
+              <div>
+                <span>Payments</span>
                 <strong>
                   {paymentImport?.updated ?? 0}
                 </strong>
-
-                <small>
-                  updated
-                </small>
-
+                <small>updated</small>
               </div>
 
-
-              <div className="import-stat">
-
-                <span>
-                  Bank Transactions
-                </span>
-
+              <div>
+                <span>Bank Transactions</span>
                 <strong>
                   {bankImport?.updated ?? 0}
                 </strong>
-
-                <small>
-                  updated
-                </small>
-
+                <small>updated</small>
               </div>
 
             </div>
 
-
-            <div className="ingestion-import-detail">
+            <div className="import-total-row">
 
               <div>
-                <span>
-                  Inserted
-                </span>
-
-                <strong>
-                  {totalInserted}
-                </strong>
+                <span>Inserted</span>
+                <strong>{totalInserted}</strong>
               </div>
 
-
               <div>
-                <span>
-                  Updated
-                </span>
-
-                <strong>
-                  {totalUpdated}
-                </strong>
+                <span>Updated</span>
+                <strong>{totalUpdated}</strong>
               </div>
 
-
               <div>
-                <span>
-                  Skipped
-                </span>
-
-                <strong>
-                  {totalSkipped}
-                </strong>
+                <span>Skipped</span>
+                <strong>{totalSkipped}</strong>
               </div>
 
             </div>

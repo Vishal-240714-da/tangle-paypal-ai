@@ -784,6 +784,10 @@ def create_review_queue():
     """
     Ensure every risk assessment requiring human review
     has a corresponding Review record.
+
+    Review-required cases are moved through the TANGLE
+    lifecycle into PENDING_REVIEW before the Review
+    record is created.
     """
 
     session = SessionLocal()
@@ -817,6 +821,53 @@ def create_review_queue():
             if case is None:
                 continue
 
+            # ------------------------------------------------
+            # Move case into the review lifecycle state.
+            # ------------------------------------------------
+
+            if case.status == "OPEN":
+                lifecycle_result = (
+                    transition_case_with_session(
+                        session=session,
+                        case_id=case.case_id,
+                        new_status="INVESTIGATING",
+                        changed_by="SYSTEM",
+                        reason=(
+                            "Case requires human review."
+                        ),
+                    )
+                )
+
+                if not lifecycle_result["success"]:
+                    raise ValueError(
+                        lifecycle_result["message"]
+                    )
+
+            if case.status == "INVESTIGATING":
+                lifecycle_result = (
+                    transition_case_with_session(
+                        session=session,
+                        case_id=case.case_id,
+                        new_status="PENDING_REVIEW",
+                        changed_by="SYSTEM",
+                        reason=(
+                            "Case requires human review."
+                        ),
+                    )
+                )
+
+                if not lifecycle_result["success"]:
+                    raise ValueError(
+                        lifecycle_result["message"]
+                    )
+
+            if case.status != "PENDING_REVIEW":
+                raise ValueError(
+                    f"Case {case.case_id} cannot enter "
+                    f"the review queue from status "
+                    f"{case.status}."
+                )
+
             review = Review(
                 case_id=risk.case_id,
                 case_status=case.status,
@@ -849,7 +900,6 @@ def create_review_queue():
 
     finally:
         session.close()
-
 
 def run_self_test():
     summary = get_review_summary()

@@ -10,6 +10,8 @@ from backend.services.data_quality_service import (
     run_staged_data_quality_check,
 )
 from database.import_data import import_source_datasets
+from generator.generate_data import run_reconciliation as generate_reconciliation
+from generator.generate_data import run_reconciliation as generate_reconciliation
 
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -468,5 +470,9 @@ def import_active_datasets():
         reviews
     """
     result = import_source_datasets()
+
+    generate_reconciliation()
+
+    result["reconciliation_status"] = "generated"
 
     return result

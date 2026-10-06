@@ -46,27 +46,36 @@ describe("Dashboard", () => {
       ).toBeInTheDocument();
     });
 
+    // KPI values
     expect(screen.getByText("202")).toBeInTheDocument();
     expect(screen.getByText("25")).toBeInTheDocument();
     expect(screen.getByText("40")).toBeInTheDocument();
     expect(screen.getByText("197")).toBeInTheDocument();
 
+    // Outstanding Balance
     expect(
-    screen.getByText("Outstanding Balance")
+      screen.getByText("Outstanding Balance")
     ).toBeInTheDocument();
 
     expect(
-    screen.getByText("Outstanding Balance")
-        .parentElement
-    ).toHaveTextContent("$1,25,000");
+      screen.getByText("$125,000")
+    ).toBeInTheDocument();
 
+    // Payment Coverage
     expect(
-    screen.getByText("Payment Coverage")
-        .parentElement
-    ).toHaveTextContent("82.5%");
+      screen.getByText("Payment Coverage")
+    ).toBeInTheDocument();
 
+    // The percentage appears in the financial value
+    // and again in the financial meta section.
+    expect(
+      screen.getAllByText("82.5%")
+    ).toHaveLength(2);
+
+    // Resolved / Approved
     expect(screen.getByText("150")).toBeInTheDocument();
 
+    // API call
     expect(api.get).toHaveBeenCalledWith(
       "/api/dashboard/summary"
     );
@@ -74,20 +83,20 @@ describe("Dashboard", () => {
 
   test("shows error message when dashboard API fails", async () => {
     api.get.mockRejectedValue(
-        new Error("API request failed")
-        );
+      new Error("API request failed")
+    );
 
     const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
-        render(<Dashboard />);
+    render(<Dashboard />);
 
     await waitFor(() => {
-        expect(
-            screen.getByText("Unable to load dashboard data.")
-        ).toBeInTheDocument();
-        });
+      expect(
+        screen.getByText("Unable to load dashboard data.")
+      ).toBeInTheDocument();
+    });
 
     expect(consoleErrorSpy).toHaveBeenCalled();
 
